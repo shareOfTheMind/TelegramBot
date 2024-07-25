@@ -1,0 +1,6 @@
+tgram_venv
+__python__/
+*.pyc
+insta.*
+runescape_fren*
+.env
