@@ -4,10 +4,13 @@ from dotenv import load_dotenv
 from telegram import Update
 from telegram.ext import Application, CommandHandler, MessageHandler, filters
 
+from tgram_bot_helper import *
+
 # load environment variables
 load_dotenv()
 api_token = os.getenv('API_KEY')
-chan_id = int(os.getenv('DEST_CHAN_ID'))
+chan_id = int(os.getenv('DEV_ID'))
+# chan_id = int(os.getenv('DEST_CHAN_ID'))
 
 # Replace 'YOUR_BOT_TOKEN' with the token you get from BotFather
 TOKEN = api_token
@@ -20,6 +23,7 @@ async def start(update: Update, context):
 async def forward_message(update: Update, context):
     message = update.message
 
+    media_obj = get_media_from_ig_post(message=message)
     try:
         # Forward the message to the destination channel
         await message.forward(chat_id=DESTINATION_CHANNEL_ID)
