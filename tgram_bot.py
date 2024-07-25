@@ -1,11 +1,18 @@
 import os
+
+from dotenv import load_dotenv
 from telegram import Update
 from telegram.ext import Application, CommandHandler, MessageHandler, filters
 
+# load environment variables
+load_dotenv()
+api_token = os.getenv('API_KEY')
+chan_id = int(os.getenv('DEST_CHAN_ID'))
+
 # Replace 'YOUR_BOT_TOKEN' with the token you get from BotFather
-TOKEN = '7476924663:AAHWu3WA33-SwiZTS_cZ6tGGfNmq3Yp9hWg'
+TOKEN = api_token
 # Replace 'DESTINATION_CHANNEL_ID' with the ID of @mindvirusfeed channel
-DESTINATION_CHANNEL_ID = -1002232776392
+DESTINATION_CHANNEL_ID = chan_id
 
 async def start(update: Update, context):
     await update.message.reply_text('Welcome! Rohan OWNS YOUR SOUL --> Send me any text, video, or link, and I\'ll forward it to the channel.')

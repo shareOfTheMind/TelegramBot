@@ -38,7 +38,8 @@ if __name__ == "__main__":
     # post_url = "https://www.instagram.com/p/CI4QG6gjW3a/"
     # post_url = "https://www.instagram.com/p/CtMaz6LLHgR/"
 
-    codes = ["CI4QG6gjW3a","CtMaz6LLHgR"]
+    # codes = ["CI4QG6gjW3a","CtMaz6LLHgR","C90R_ojOy_A"]
+    codes = ["CI4QG6gjW3a"]
 
     for short_code in codes:
         download_instagram_post(f"https://www.instagram.com/p/{short_code}/")
