@@ -3,7 +3,7 @@ import datetime
 import tempfile
 
 from dotenv import load_dotenv
-from telegram import Update, InputFile, InputMediaVideo, Video, constants
+from telegram import Update, InputFile
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, CallbackContext
 
 from tgram_bot_helper import *
