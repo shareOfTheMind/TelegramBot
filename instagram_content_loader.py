@@ -1,47 +1,68 @@
 import os
 import instaloader
+import requests
+import glob
 
-def download_instagram_post(post_url):
+def get_instagram_post_media(shortcode):
     # Initialize Instaloader
     loader = instaloader.Instaloader()
 
     try:
-        # Extract post shortcode from URL
-        shortcode = post_url.split('/')[-2]
+        post_url = f"https://www.instagram.com/p/{shortcode}/"
 
         # Load post by shortcode
         post = instaloader.Post.from_shortcode(loader.context, shortcode)
 
-        # Download media
-        # loader.download_post(post, target=f"{post.owner_username}_{shortcode}")
+        # if post is a video, return the video url; else return the photo
+        if post.is_video:
+            media_url = post.video_url
+        else:
+            media_url = post.url
 
-        print("".ljust(100, "#"))
-        print(f"Downloaded media from post: {post_url}")
-        print(f"Shortcode: {shortcode}")
-        print(f"Caption: {post.caption}")
+        # download media content
+        response = requests.get(media_url, stream=True)
 
-        for hashtag in post.caption_hashtags:
-            print(f"Hashtag: {hashtag}")
+        # response = requests.get(media_url)
+        response.raise_for_status() # ensure we notice bad response
 
-        for mentioned in post.caption_mentions:
-            print(f"Mentioned user: {mentioned}")
+        # store media content in a variable
+        media_content = response.content
 
-        print("".ljust(100, "#"))
-        print()
+
+        return media_content, post_url, post.profile, post.is_video
+
 
     except Exception as e:
         print(f"An error occurred: {e}")
-
-if __name__ == "__main__":
-    # Example Instagram post URL
-    # post_url = "https://www.instagram.com/p/your_post_shortcode/"
-    # post_url = "https://www.instagram.com/p/CI4QG6gjW3a/"
-    # post_url = "https://www.instagram.com/p/CtMaz6LLHgR/"
-
-    # codes = ["CI4QG6gjW3a","CtMaz6LLHgR","C90R_ojOy_A"]
-    codes = ["CI4QG6gjW3a"]
-
-    for short_code in codes:
-        download_instagram_post(f"https://www.instagram.com/p/{short_code}/")
+        return None, None, None, None
     
-    # download_instagram_post(post_url)
+
+
+# def download_instagram_post_video(shortcode):
+#     # Initialize Instaloader
+#     loader = instaloader.Instaloader()
+
+#     try:
+#         # Load post by shortcode
+#         post = instaloader.Post.from_shortcode(loader.context, shortcode)
+
+#         dir_name = f"{post.owner_username}_{shortcode}"
+#         loader.download_post(post=post, target=dir_name)
+        
+#         media_path = find_mp4_files(directory=dir_name)
+#         return media_path
+
+#     except Exception as e:
+#         print(f"An error occurred: {e}")
+#         return None, None, None, None
+    
+
+
+
+# def find_mp4_files(directory):
+#     # Use glob to find all .mp4 files in the given directory
+#     mp4_files = glob.glob(os.path.join(directory, '*.mp4'))
+#     if mp4_files:
+#         return mp4_files.pop(0)
+    
+#     return None
