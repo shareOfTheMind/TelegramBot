@@ -1,11 +1,11 @@
 import re
 
 from telegram import Message
-from instagram_content_loader import download_instagram_post
+from instagram_content_loader import get_instagram_post_media
 
 
 # Regular expression to extract the shortcode
-regex = r"https://www\.instagram\.com/p/([^/?]+)"
+regex = r"https://www\.instagram\.com/(?:p|reel)/([^/?]+)"
 
 
 
@@ -21,8 +21,6 @@ def get_shortcode_from_message(message: Message) -> str | None:
     return shortcode
 
 
-def get_media_from_ig_post(message: Message) -> bytes | None:
+def get_media_from_ig_post(short_code):
     
-    shortcode = get_shortcode_from_message(message=message)
-
-    return download_instagram_post(shortcode=shortcode)
+    return get_instagram_post_media(shortcode=short_code)
