@@ -7,6 +7,7 @@ def download_instagram_post(shortcode):
     loader = instaloader.Instaloader()
 
     try:
+        post_url = f"https://www.instagram.com/p/{shortcode}/"
 
         # Load post by shortcode
         post = instaloader.Post.from_shortcode(loader.context, shortcode)
@@ -23,7 +24,7 @@ def download_instagram_post(shortcode):
         media_content = response.content
 
 
-        return media_content
+        return media_content, post_url, post.profile
 
 
     except Exception as e:

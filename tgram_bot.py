@@ -1,8 +1,9 @@
 import os
+import datetime
 
 from dotenv import load_dotenv
-from telegram import Update
-from telegram.ext import Application, CommandHandler, MessageHandler, filters
+from telegram import Update, InputFile
+from telegram.ext import Application, CommandHandler, MessageHandler, filters, CallbackContext
 
 from tgram_bot_helper import *
 
@@ -17,15 +18,19 @@ TOKEN = api_token
 # Replace 'DESTINATION_CHANNEL_ID' with the ID of @mindvirusfeed channel
 DESTINATION_CHANNEL_ID = chan_id
 
-async def start(update: Update, context):
+async def start(update: Update, context: CallbackContext):
     await update.message.reply_text('Welcome! Rohan OWNS YOUR SOUL --> Send me any text, video, or link, and I\'ll forward it to the channel.')
 
 async def forward_message(update: Update, context):
     message = update.message
 
-    media_obj = get_media_from_ig_post(message=message)
+    media_obj, url, profile = get_media_from_ig_post(message=message)
+
+    message.edit_text(text=url)
+    new_media = InputFile(obj=media_obj, filename=f"{profile}_{datetime.datetime.now()}.jpg")
     try:
         # Forward the message to the destination channel
+        await context.bot.send_photo(chat_id=DESTINATION_CHANNEL_ID, photo=new_media)
         await message.forward(chat_id=DESTINATION_CHANNEL_ID)
         await message.reply_text("Your submission has been forwarded to the channel.")
     except Exception as e:
