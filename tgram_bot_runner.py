@@ -1,5 +1,6 @@
 import os
 import datetime
+import gc
 
 from dotenv import load_dotenv
 from telegram import Update, InputFile
@@ -56,7 +57,15 @@ async def forward_message(update: Update, context: CallbackContext):
                     else:
                         new_media = InputFile(obj=media_obj, filename=f"{profile}_{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}.jpg")
                         await context.bot.send_photo(chat_id=DESTINATION_CHANNEL_ID, photo=new_media, caption=url)
-            
+                    
+                    # free memory after sending it to tg channel server
+                    # del media_obj
+                    media_obj = None
+                    gc.collect()
+
+                # if the message does not contain an instagram link
+                else:
+                    await message.forward(chat_id=DESTINATION_CHANNEL_ID)
 
             # else if the message was simply medai and not text
             elif message.video:
@@ -67,7 +76,6 @@ async def forward_message(update: Update, context: CallbackContext):
    
 
             # Forward other post meta-data here message to the destination channel
-            # await message.forward(chat_id=DESTINATION_CHANNEL_ID)
             await message.reply_text("Your submission has been forwarded to the channel.")
 
         # If there is no message being forwarded (no Update message); then do nothing
