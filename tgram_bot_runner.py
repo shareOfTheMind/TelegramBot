@@ -1,6 +1,5 @@
 import os
 import datetime
-import tempfile
 
 from dotenv import load_dotenv
 from telegram import Update, InputFile
@@ -30,6 +29,8 @@ async def forward_message(update: Update, context: CallbackContext):
     try:
         # check to see if a message exists; and also ignore messages directly sent within the channel
         if message:
+            
+            # NOTE: You're gonna wanna check for IG link within the message text, and if not, just forward the message text
             # firstly, get the shortcode and ensure that it was parsed successfully from a valid instagram post url
             if message.text:
                 shortcode = get_shortcode_from_message(message=message)
@@ -56,12 +57,13 @@ async def forward_message(update: Update, context: CallbackContext):
 
    
 
+            # Forward other post meta-data here message to the destination channel
+            # await message.forward(chat_id=DESTINATION_CHANNEL_ID)
+            await message.reply_text("Your submission has been forwarded to the channel.")
 
+        # If there is no message being forwarded (no Update message); then do nothing
         else:
-            message = Message(message_id=DESTINATION_CHANNEL_ID)
-        # Forward other post meta-data here message to the destination channel
-        # await message.forward(chat_id=DESTINATION_CHANNEL_ID)
-        await message.reply_text("Your submission has been forwarded to the channel.")
+            return
     except Exception as e:
         print(f"Error forwarding message: {e}")
         print(f"Type Error: {type(e)}")
