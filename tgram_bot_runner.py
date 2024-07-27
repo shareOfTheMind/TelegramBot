@@ -24,32 +24,41 @@ DESTINATION_CHANNEL_ID = chan_id
 async def start(update: Update, context: CallbackContext):
     await update.message.reply_text('Welcome! Rohan OWNS YOUR SOUL --> Send me any text, video, or link, and I\'ll forward it to the channel.')
 
+
 async def forward_message(update: Update, context: CallbackContext):
     message = update.message
     try:
         # check to see if a message exists; and also ignore messages directly sent within the channel
         if message:
-            
-            # NOTE: You're gonna wanna check for IG link within the message text, and if not, just forward the message text
-            # firstly, get the shortcode and ensure that it was parsed successfully from a valid instagram post url
+
+            # if the message is text
             if message.text:
-                shortcode = get_shortcode_from_message(message=message)
-                if not shortcode:
-                    await message.reply_text("No valid Instagram post URL found in the message.")
-                    return
-            
-                # next, grab the media, url, profile, and video (bool) from post obj
-                media_obj, url, profile, is_video = get_media_from_ig_post(short_code=shortcode)
-                if not media_obj:
-                    await message.reply_text("Failed to download media from Instagram post.")
-                    return
+                msg_text = message.text
+
+                # Let's check to see if the message text being forwarded contains an instagram link
+                if contains_instagram_link(msg_text):
+
+                    # firstly, get the shortcode and ensure that it was parsed successfully from a valid instagram post url
+                    shortcode = get_shortcode_from_message(message=message)
+                    if not shortcode:
+                        await message.reply_text("No valid Instagram post URL found in the message.")
+                        return
                 
-                if is_video:
-                    video_input = InputFile(obj=media_obj, filename=f"{profile}_{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}.mp4")
-                    await context.bot.send_video(chat_id=DESTINATION_CHANNEL_ID, video=video_input, caption=url, supports_streaming=True)
-                else:
-                    new_media = InputFile(obj=media_obj, filename=f"{profile}_{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}.jpg")
-                    await context.bot.send_photo(chat_id=DESTINATION_CHANNEL_ID, photo=new_media, caption=url)
+                    # next, grab the media, url, profile, and video (bool) from post obj
+                    media_obj, url, profile, is_video = get_media_from_ig_post(short_code=shortcode)
+                    if not media_obj:
+                        await message.reply_text("Failed to download media from Instagram post.")
+                        return
+                    
+                    if is_video:
+                        video_input = InputFile(obj=media_obj, filename=f"{profile}_{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}.mp4")
+                        await context.bot.send_video(chat_id=DESTINATION_CHANNEL_ID, video=video_input, caption=url, supports_streaming=True)
+                    else:
+                        new_media = InputFile(obj=media_obj, filename=f"{profile}_{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}.jpg")
+                        await context.bot.send_photo(chat_id=DESTINATION_CHANNEL_ID, photo=new_media, caption=url)
+            
+
+            # else if the message was simply medai and not text
             elif message.video:
                 video_media = message.video
 
@@ -68,6 +77,10 @@ async def forward_message(update: Update, context: CallbackContext):
         print(f"Error forwarding message: {e}")
         print(f"Type Error: {type(e)}")
         await message.reply_text("Sorry, there was an error forwarding your submission.")
+
+
+
+
 
 def main():
     application = Application.builder().token(TOKEN).build()
