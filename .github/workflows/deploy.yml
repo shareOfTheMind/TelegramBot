@@ -23,8 +23,8 @@ jobs:
           git archive --format=tar.gz HEAD -o /tmp/deploy.tar.gz
 
       - name: Copy tarball to VPS
-        run: scp /tmp/deploy.tar.gz user@${{ secrets.TG_PROD_SERVER }}:/srv/telegram_service
+        run: scp /tmp/deploy.tar.gz deployuser@${{ secrets.TG_PROD_SERVER }}:/srv/telegram_service
 
       - name: SSH into VPS and deploy
         run: |
-          ssh user@${{ secrets.TG_PROD_SERVER }} 'cd /srv/telegram_service && tar -xzf deploy.tar.gz && ./deploy.sh'
+          ssh deployuser@${{ secrets.TG_PROD_SERVER }} 'cd /srv/telegram_service && tar -xzf deploy.tar.gz && ./deploy.sh'
