@@ -1,6 +1,7 @@
 import os
 import datetime
 import gc
+import random
 
 from dotenv import load_dotenv
 from telegram import Update, InputFile
@@ -27,6 +28,19 @@ async def start(update: Update, context: CallbackContext):
 
 
 async def forward_message(update: Update, context: CallbackContext):
+    submission_phrases = [
+        "Wow, this masterpiece is going to break the internet. We're truly in the presence of genius.",
+        "Thank you for blessing us with this content. The world was waiting for exactly this!",
+        "What a revolutionary contribution! Clearly, you're the Einstein of social media.",
+        "We're all speechless by your groundbreaking submission. How did we survive without it?",
+        "Move over, influencers. There's a new visionary in town!",
+        "Just when we thought we'd seen it all, you've outdone yourself. Bravo.",
+        "Our humble little platform can barely contain the sheer brilliance of this media.",
+        "Please, share more! The world needs every ounce of your unparalleled creativity.",
+        "How fortunate we are to witness this. Truly, the next big thing in social media.",
+        "You've set a new standard. We're all eagerly waiting for the Nobel Prize announcement."
+    ]
+
     message = update.message
     try:
         # check to see if a message exists; and also ignore messages directly sent within the channel
@@ -46,17 +60,20 @@ async def forward_message(update: Update, context: CallbackContext):
                         return
                 
                     # next, grab the media, url, profile, and video (bool) from post obj
-                    media_obj, url, profile, is_video = get_media_from_ig_post(short_code=shortcode)
+                    media_obj, url, profile, is_video, like_count, view_count = get_media_from_ig_post(short_code=shortcode)
                     if not media_obj:
                         await message.reply_text("Failed to download media from Instagram post.")
                         return
                     
+                    await message.reply_text("Your media was parsed successfully and is processing! A humble thanks to grace the feed with intelligence.")
                     if is_video:
+                        caption_data = f"{url}\n❤️ : {like_count:,}\n👀 : {view_count:,}"
                         video_input = InputFile(obj=media_obj, filename=f"{profile}_{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}.mp4")
-                        await context.bot.send_video(chat_id=DESTINATION_CHANNEL_ID, video=video_input, caption=url, supports_streaming=True)
+                        await context.bot.send_video(chat_id=DESTINATION_CHANNEL_ID, video=video_input, caption=caption_data, supports_streaming=True)
                     else:
+                        caption_data = f"{url}\n❤️ : {like_count:,}"
                         new_media = InputFile(obj=media_obj, filename=f"{profile}_{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}.jpg")
-                        await context.bot.send_photo(chat_id=DESTINATION_CHANNEL_ID, photo=new_media, caption=url)
+                        await context.bot.send_photo(chat_id=DESTINATION_CHANNEL_ID, photo=new_media, caption=caption_data)
                     
                     # free memory after sending it to tg channel server
                     # del media_obj
@@ -67,16 +84,22 @@ async def forward_message(update: Update, context: CallbackContext):
                 else:
                     await message.forward(chat_id=DESTINATION_CHANNEL_ID)
 
-            # else if the message was simply medai and not text
+            # else if the message was video media
             elif message.video:
                 video_media = message.video
 
-                await context.bot.send_video(chat_id=DESTINATION_CHANNEL_ID, video=video_media, caption="Custom User Video")
+                await context.bot.send_video(chat_id=DESTINATION_CHANNEL_ID, video=video_media, caption=f"{update.effective_user or 'Custom User'}'s Video")
+            # else if the message was photo media
+            elif message.photo:
+                photo_media = message.photo[-1]
+
+                await context.bot.send_photo(chat_id=DESTINATION_CHANNEL_ID, photo=photo_media, caption=f"{update.effective_user or 'Custom User'}'s Photo")
 
    
 
             # Forward other post meta-data here message to the destination channel
-            await message.reply_text("Your submission has been forwarded to the channel.")
+            await message.reply_text(random.choice(submission_phrases))
+            # await message.reply_text("Your submission has been forwarded to the channel.")
 
         # If there is no message being forwarded (no Update message); then do nothing
         else:

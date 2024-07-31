@@ -8,8 +8,10 @@ from instagram_content_loader import get_instagram_post_media
 
 
 def get_shortcode_from_message(message: Message) -> str | None:
-    # Regular expression to extract the shortcode
-    regex = r"https://www\.instagram\.com/(?:p|reel)/([^/?]+)"
+    '''
+        Regular expression to extract the shortcode from an incoming message text
+    '''
+    regex = r"https://www\.instagram\.com/(?:p|reel|reels)/([^/?]+)"
 
 
     str_url = message.text
@@ -24,7 +26,7 @@ def get_shortcode_from_message(message: Message) -> str | None:
 
 
 
-def get_media_from_ig_post(short_code: str) -> (tuple[bytes, str, str, bool] | tuple[None, None, None, None]):
+def get_media_from_ig_post(short_code: str) -> (tuple[bytes, str, str, bool, int, int | None] | tuple[None, None, None, None, None, None]):
     '''
         Calls `get_instagram_post_media()` to extract specific metadata from an instagram post
 
@@ -45,7 +47,7 @@ def contains_instagram_link(text: str) -> bool:
     '''
 
     # Regular expression to match Instagram /p/ or /reel/ links
-    pattern = r'https?://(www\.)?instagram\.com/(p|reel)/[A-Za-z0-9_-]+/?'
+    pattern = r'https?://(www\.)?instagram\.com/(p|reel|reels)/[A-Za-z0-9_-]+/?'
     
     # Search for the pattern in the provided text
     match = re.search(pattern, text)
