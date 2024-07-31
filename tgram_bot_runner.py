@@ -34,18 +34,6 @@ async def start(update: Update, context: CallbackContext):
 async def forward_message(update: Update, context: CallbackContext):
     write_log(level='info', message=f"{datetime.datetime.now().strftime('%y-%m-%d_%T')} : Forward_message called with update: {update}")
 
-    submission_phrases = [
-        "Wow, this masterpiece is going to break the internet. We're truly in the presence of genius.",
-        "Thank you for blessing us with this content. The world was waiting for exactly this!",
-        "What a revolutionary contribution! Clearly, you're the Einstein of social media.",
-        "We're all speechless by your groundbreaking submission. How did we survive without it?",
-        "Move over, influencers. There's a new visionary in town!",
-        "Just when we thought we'd seen it all, you've outdone yourself. Bravo.",
-        "Our humble little platform can barely contain the sheer brilliance of this media.",
-        "Please, share more! The world needs every ounce of your unparalleled creativity.",
-        "How fortunate we are to witness this. Truly, the next big thing in social media.",
-        "You've set a new standard. We're all eagerly waiting for the Nobel Prize announcement."
-    ]
 
     message = update.message
     try:
@@ -109,7 +97,7 @@ async def forward_message(update: Update, context: CallbackContext):
    
 
             # Forward other post meta-data here message to the destination channel
-            await message.reply_text(random.choice(submission_phrases))
+            await message.reply_text(f"[Submitted]\n{random.choice(submission_phrases)}")
             # await message.reply_text("Your submission has been forwarded to the channel.")
 
         # If there is no message being forwarded (no Update message); then do nothing
@@ -148,6 +136,7 @@ def main():
     application.add_handler(MessageHandler(filters.TEXT | filters.VIDEO | filters.PHOTO | filters.Entity('url'), forward_message))
 
     application.run_polling(allowed_updates=Update.ALL_TYPES)
+    remove_old_logs()
 
 if __name__ == '__main__':
     main()
