@@ -65,13 +65,13 @@ async def forward_message(update: Update, context: CallbackContext):
                         await message.reply_text("Failed to download media from Instagram post.")
                         return
                     
-                    await message.reply_text("Your media was parsed successfully and is processing! A humble thanks to grace the feed with intelligence.")
+                    await message.reply_text("Your media was parsed successfully and is processing!")
                     if is_video:
-                        caption_data = f"{url}\n❤️ : {like_count:,}\n👀 : {view_count:,}"
+                        caption_data = f"{url}\n❤️ {like_count:,}\n👀 {view_count:,}"
                         video_input = InputFile(obj=media_obj, filename=f"{profile}_{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}.mp4")
                         await context.bot.send_video(chat_id=DESTINATION_CHANNEL_ID, video=video_input, caption=caption_data, supports_streaming=True)
                     else:
-                        caption_data = f"{url}\n❤️ : {like_count:,}"
+                        caption_data = f"{url}\n❤️ {like_count:,}"
                         new_media = InputFile(obj=media_obj, filename=f"{profile}_{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}.jpg")
                         await context.bot.send_photo(chat_id=DESTINATION_CHANNEL_ID, photo=new_media, caption=caption_data)
                     
