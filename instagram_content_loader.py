@@ -1,7 +1,9 @@
-import os
 import instaloader
 import requests
-import glob
+
+
+
+
 
 def get_instagram_post_media(shortcode):
     # Initialize Instaloader
@@ -29,12 +31,12 @@ def get_instagram_post_media(shortcode):
         media_content = response.content
 
 
-        return media_content, post_url, post.profile, post.is_video
+        return media_content, post_url, post.profile, post.is_video, post.likes, post.video_view_count
 
 
     except Exception as e:
         print(f"An error occurred: {e}")
-        return None, None, None, None
+        return None, None, None, None, None, None
     
 
 

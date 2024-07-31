@@ -1,0 +1,30 @@
+name: Deploy to VPS
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up SSH
+        uses: webfactory/ssh-agent@v0.5.3
+        with:
+          ssh-private-key: ${{ secrets.TG_DEPLOY_SSH_KEY }}
+
+      - name: Create tarball of files respecting .gitignore
+        run: |
+          git archive --format=tar.gz HEAD -o /tmp/deploy.tar.gz
+
+      - name: Copy tarball to VPS
+        run: scp /tmp/deploy.tar.gz user@${{ secrets.TG_PROD_SERVER }}:/srv/telegram_service
+
+      - name: SSH into VPS and deploy
+        run: |
+          ssh user@${{ secrets.TG_PROD_SERVER }} 'cd /srv/telegram_service && tar -xzf deploy.tar.gz && ./deploy.sh'
