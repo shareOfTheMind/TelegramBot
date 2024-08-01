@@ -7,7 +7,6 @@ import traceback
 from dotenv import load_dotenv
 from telegram import Update, InputFile
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, CallbackContext
-from asyncio import QueueEmpty
 
 from tgram_bot_helper import *
 from tgram_bot_logger import setup_logger, write_log, remove_old_logs
@@ -128,17 +127,6 @@ async def forward_message(update: Update, context: CallbackContext):
         await message.reply_text("Sorry, there was an error forwarding your submission.")
 
 
-# Function to clear the update queue
-async def clear_update_queue(application: Application):
-    queue = application.updater.update_queue
-    no_items = 0
-    while not queue.empty():
-        try:
-            queue.get_nowait()
-            no_items += 1
-        except QueueEmpty:
-            write_log(message=f"{no_items} Items Removed from Queue.", level='info')
-            break
 
 
 def main():
@@ -149,11 +137,8 @@ def main():
     application.add_handler(CommandHandler("start", start))
     application.add_handler(MessageHandler(filters.TEXT | filters.VIDEO | filters.PHOTO | filters.Entity('url'), forward_message))
 
-    write_log(message=f"Clearing Message Queue", level='info')
-    clear_update_queue(application=application)
-
-    write_log(message=f"Starting Polling", level='info')
-    application.run_polling(allowed_updates=Update.ALL_TYPES)
+    write_log(message=f"Clearing Message Queue and Starting Polling...", level='info')
+    application.run_polling(allowed_updates=Update.ALL_TYPES, drop_pending_updates=True)
     remove_old_logs()
 
 if __name__ == '__main__':
