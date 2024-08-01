@@ -58,6 +58,7 @@ async def forward_message(update: Update, context: CallbackContext):
                     # next, grab the media, url, profile, and video (bool) from post obj
                     media_obj, url, profile, is_video, like_count, view_count = get_media_from_ig_post(short_code=shortcode)
                     if not media_obj:
+                        write_log(message=f"{datetime.datetime.now().strftime('%y-%m-%d_%T')} : Media Not Parsed Successfully -> {media_obj}", level='warning')
                         await message.reply_text("Failed to download media from Instagram post.")
                         return
                     
