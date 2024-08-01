@@ -13,7 +13,7 @@ current_logger: Logger = None
 
 
 
-def setup_logger(level=logging.INFO, log_format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'):
+def setup_logger(level=logging.INFO, log_format=f'[%(levelname)s] %(asctime)s : %(name)s - %(message)s', name='Bot Runner Logger'):
     '''
         #### Set up global logger preferences
         > The global logger will print logging to console and to a file
@@ -21,26 +21,31 @@ def setup_logger(level=logging.INFO, log_format='%(asctime)s - %(name)s - %(leve
     global current_logger
 
     try:
-        # Create log directory if it doesn't exist
-        os.makedirs(log_directory, exist_ok=True)
-        os.chmod(log_directory, 0o755)
         
         # Create a custom logger
-        logger = logging.getLogger(__name__)
+        logger = logging.getLogger(name)
         logger.setLevel(level)
         
-        # Create handlers
-        file_handler = logging.FileHandler(log_file)
+
+
+        # Create formatters and add them to handlers (CONSOLE LOGGER)
+        formatter = logging.Formatter(fmt=log_format, datefmt='%Y-%m-%d-%H-%M-%S')
         console_handler = logging.StreamHandler()
-        
-        # Create formatters and add them to handlers
-        formatter = logging.Formatter(log_format)
-        file_handler.setFormatter(formatter)
         console_handler.setFormatter(formatter)
-        
-        # Add handlers to the logger
-        logger.addHandler(file_handler)
         logger.addHandler(console_handler)
+
+
+        try:
+            # Create handlers (FILE LOGGER)
+            # Create log directory if it doesn't exist
+            os.makedirs(log_directory, exist_ok=True)
+            os.chmod(log_directory, 0o755)
+            file_handler = logging.FileHandler(log_file)
+            file_handler.setFormatter(formatter)
+            logger.addHandler(file_handler)
+        except Exception:
+            print("Failed to create file logger. Could have been directory or set permissions.")
+
 
         current_logger = logger
     except Exception as ex:
