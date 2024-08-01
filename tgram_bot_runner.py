@@ -27,7 +27,6 @@ async def start(update: Update, context: CallbackContext):
     await update.message.reply_text('Welcome! Rohan OWNS YOUR SOUL --> Send me any text, video, or link, and I\'ll forward it to the channel.')
 
 
-
 async def forward_message(update: Update, context: CallbackContext):
     submission_phrases = [
         "Wow, this masterpiece is going to break the internet. We're truly in the presence of genius.",
