@@ -1,7 +1,8 @@
 import instaloader
 import requests
+import datetime
 
-
+from tgram_bot_logger import write_log
 
 
 
@@ -34,7 +35,8 @@ def get_instagram_post_media(shortcode):
         return media_content, post_url, post.profile, post.is_video, post.likes, post.video_view_count
 
     except Exception as e:
-        print(f"An error occurred: {e}")
+        write_log(message=f"{datetime.datetime.now().strftime('%y-%m-%d_%T')} : An Exception occured when calling 'get_instagram_post_media()' -> {e}", level='error')
+        # print(f"An error occurred: {e}")
         return None, None, None, None, None, None
     
 
