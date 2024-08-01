@@ -42,13 +42,12 @@ def setup_logger(level=logging.INFO, log_format=f'[%(levelname)s] %(asctime)s : 
             # Create log directory if it doesn't exist
             os.makedirs(log_directory, exist_ok=True)
             os.chmod(log_directory, 0o755)
-            os.chown(log_directory, 1000)
             file_handler = logging.FileHandler(log_file)
             file_handler.setFormatter(formatter)
             logger.addHandler(file_handler)
-        except Exception:
+        except Exception as ex1:
             failed_file_logging = True
-            print("Failed to create file logger. Could have been directory or set permissions.")
+            print(f"[ERROR] Failed to create file logger. Could have been directory or set permissions: {ex1}")
 
 
         current_logger = logger
