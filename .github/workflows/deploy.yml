@@ -18,6 +18,11 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.TG_DEPLOY_SSH_KEY }}
 
+      - name: Add known hosts
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.TG_PROD_SERVER_HOST_KEY }}" >> ~/.ssh/known_hosts
+
       - name: Create tarball of files respecting .gitignore
         run: |
           git archive --format=tar.gz HEAD -o /tmp/deploy.tar.gz
