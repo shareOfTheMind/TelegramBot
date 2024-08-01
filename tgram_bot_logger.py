@@ -3,6 +3,7 @@ import os
 
 from logging import Logger
 from datetime import datetime, timedelta
+import platform
 
 # Script-level variables
 log_directory = '/var/log/tgram_bot_logging'
@@ -13,7 +14,7 @@ current_logger: Logger = None
 
 
 
-def setup_logger(level=logging.INFO, log_format=f'[%(levelname)s] %(asctime)s : %(name)s - %(message)s', name='Bot Runner Logger'):
+def setup_logger(level=logging.INFO, log_format=f'[%(levelname)s] %(asctime)s : (%(name)s) - %(message)s', name='Bot Runner Logger'):
     '''
         #### Set up global logger preferences
         > The global logger will print logging to console and to a file
@@ -21,7 +22,7 @@ def setup_logger(level=logging.INFO, log_format=f'[%(levelname)s] %(asctime)s : 
     global current_logger
 
     try:
-        
+        failed_file_logging = False
         # Create a custom logger
         logger = logging.getLogger(name)
         logger.setLevel(level)
@@ -44,10 +45,34 @@ def setup_logger(level=logging.INFO, log_format=f'[%(levelname)s] %(asctime)s : 
             file_handler.setFormatter(formatter)
             logger.addHandler(file_handler)
         except Exception:
+            failed_file_logging = True
             print("Failed to create file logger. Could have been directory or set permissions.")
 
 
         current_logger = logger
+
+        first_log = [
+            '\n\n',
+            '####################################################################################',
+            '#',
+            '#',
+            '#',
+            f'#  **Loggger ({name}) Started!**\n#',
+            f'#  File Logging Started At: {log_file if not failed_file_logging else "-->Error Starting File Logging<--"}\n#',
+            f'#  OS Name: {os.name}',
+            f'#  System Info: {platform.system()}',
+            f'#  Release: {platform.release()}',
+            f'#  Version: {platform.version()}',
+            f'#  Machine: {platform.machine()}',
+            f'#  Processor: {platform.processor()}\n#',
+            f'#  User Profile: {os.getenv("HOME")}',
+            '#',
+            '#',
+            '#',
+            '####################################################################################\n\n'
+        ]
+
+        write_log(message='\n'.join(first_log), level='info')
     except Exception as ex:
         print(f"An error occurred while setting up the logger:\n '{ex}'")
 
@@ -65,7 +90,6 @@ def write_log(level: str, message: str):
         >
         > Writes logging to both console and file
     '''
-
     try:
         if level == 'info':
             current_logger.info(message)
