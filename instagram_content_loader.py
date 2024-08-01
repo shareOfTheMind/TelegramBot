@@ -33,6 +33,7 @@ def get_instagram_post_media(shortcode):
 
         return media_content, post_url, post.profile, post.is_video, post.likes, post.video_view_count
 
+
     except Exception as e:
         print(f"An error occurred: {e}")
         return None, None, None, None, None, None
