@@ -23,6 +23,7 @@ def setup_logger(level=logging.INFO, log_format='%(asctime)s - %(name)s - %(leve
     try:
         # Create log directory if it doesn't exist
         os.makedirs(log_directory, exist_ok=True)
+        os.chmod(log_directory, 0o755)
         
         # Create a custom logger
         logger = logging.getLogger(__name__)
