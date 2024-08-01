@@ -31,6 +31,7 @@ def setup_logger(level=logging.INFO, log_format=f'[%(levelname)s] %(asctime)s : 
 
         # Create formatters and add them to handlers (CONSOLE LOGGER)
         formatter = logging.Formatter(fmt=log_format, datefmt='%Y-%m-%d-%H-%M-%S')
+
         console_handler = logging.StreamHandler()
         console_handler.setFormatter(formatter)
         logger.addHandler(console_handler)
@@ -41,6 +42,7 @@ def setup_logger(level=logging.INFO, log_format=f'[%(levelname)s] %(asctime)s : 
             # Create log directory if it doesn't exist
             os.makedirs(log_directory, exist_ok=True)
             os.chmod(log_directory, 0o755)
+            os.chown(log_directory, 1000)
             file_handler = logging.FileHandler(log_file)
             file_handler.setFormatter(formatter)
             logger.addHandler(file_handler)
