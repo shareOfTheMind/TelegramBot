@@ -1,8 +1,9 @@
 tgram_venv
-__python__/
+__pycache__
 *.pyc
 insta.*
 runescape_fren*
 iasumico*
 .env
 .vscode
+tgram_bot.py
