@@ -35,7 +35,8 @@ def get_instagram_post_media(shortcode):
         return media_content, post_url, post.profile, post.is_video, post.likes, post.video_view_count
 
     except Exception as e:
-        write_log(message=f"{datetime.datetime.now().strftime('%y-%m-%d_%T')} : An Exception occured when calling 'get_instagram_post_media()' -> {e}", level='error')
+        write_log(message=f"An Exception occured when calling 'get_instagram_post_media()'\n -> {e}", level='error')
+        write_log(message=f"An Exception occured when calling 'get_instagram_post_media()'\n -> Post URL: {post_url}\n -> Media URL: {media_url}", level='debug')
         # print(f"An error occurred: {e}")
         return None, None, None, None, None, None
     
