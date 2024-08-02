@@ -12,7 +12,7 @@ path_to_session = os.getenv('SESSION_PATH')
 def get_instagram_post_media(shortcode):
     # Initialize Instaloader
     loader = instaloader.Instaloader()
-    loader.load_session_from_file(username='gabealoi', filename=)
+    loader.load_session_from_file(username='gabealoi', filename=path_to_session)
 
     try:
         post_url = f"https://www.instagram.com/p/{shortcode}/"
