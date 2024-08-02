@@ -12,7 +12,7 @@ from tgram_bot_helper import *
 from tgram_bot_logger import setup_logger, write_log, remove_old_logs
 
 # setup logging
-bot_logger = setup_logger()
+bot_logger = setup_logger(level=10) # debug level logging
 
 # load environment variables
 load_dotenv()
