@@ -12,7 +12,14 @@ path_to_session = os.getenv('SESSION_PATH')
 def get_instagram_post_media(shortcode):
     # Initialize Instaloader
     loader = instaloader.Instaloader()
-    loader.load_session_from_file(username='gabealoi', filename=path_to_session)
+
+    # if we're in the right environment, then load the session; else we good
+    if path_to_session:
+        loader.load_session_from_file(username='gabealoi', filename=path_to_session)
+        write_log(message=f"Successfully loaded IG session from file", level='info')
+    else:
+        write_log(message=f"No IG session path found in environment.. Continuing to complete request with instaloader..", level='warning')
+
 
     try:
         post_url = f"https://www.instagram.com/p/{shortcode}/"
