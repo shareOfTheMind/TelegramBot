@@ -88,13 +88,13 @@ async def forward_message(update: Update, context: CallbackContext):
                 write_log(message="Video Message Recieved", level='info')
                 video_media = message.video
 
-                await context.bot.send_video(chat_id=DESTINATION_CHANNEL_ID, video=video_media, caption=f"{update.effective_user or 'Custom User'}'s Video")
+                await context.bot.send_video(chat_id=DESTINATION_CHANNEL_ID, video=video_media, caption=f"{update.effective_user.name or 'Custom User'}'s Video")
             # else if the message was photo media
             elif message.photo:
                 write_log(message="Photo Message Recieved", level='info')
                 photo_media = message.photo[-1]
 
-                await context.bot.send_photo(chat_id=DESTINATION_CHANNEL_ID, photo=photo_media, caption=f"{update.effective_user or 'Custom User'}'s Photo")
+                await context.bot.send_photo(chat_id=DESTINATION_CHANNEL_ID, photo=photo_media, caption=f"{update.effective_user.name or 'Custom User'}'s Photo")
 
    
 
