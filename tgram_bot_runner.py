@@ -97,7 +97,6 @@ async def forward_message(update: Update, context: CallbackContext):
                 await context.bot.send_photo(chat_id=DESTINATION_CHANNEL_ID, photo=photo_media, caption=f"{update.effective_user.name or 'Custom User'}'s Photo")
 
    
-
             # Forward other post meta-data here message to the destination channel
             await message.reply_text(f"[Submitted]\n{random.choice(submission_phrases)}")
             # await message.reply_text("Your submission has been forwarded to the channel.")
