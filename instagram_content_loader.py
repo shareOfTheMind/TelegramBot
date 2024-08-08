@@ -15,7 +15,7 @@ def get_instagram_post_media(shortcode):
 
     # if we're in the right environment, then load the session; else we good
     if path_to_session:
-        loader.load_session_from_file(username='gabealoi', filename=path_to_session)
+        loader.load_session_from_file(username='tgrambotlord', filename=path_to_session)
         write_log(message=f"Successfully loaded IG session from file", level='info')
     else:
         write_log(message=f"No IG session path found in environment.. Continuing to complete request with instaloader..", level='warning')
@@ -47,7 +47,7 @@ def get_instagram_post_media(shortcode):
 
     except Exception as e:
         write_log(message=f"An Exception occured when calling 'get_instagram_post_media()'\n -> {e}", level='error')
-        write_log(message=f"An Exception occured when calling 'get_instagram_post_media()'\n -> Post URL: {post_url}\n -> Media URL: {media_url}", level='debug')
+        write_log(message=f"An Exception occured when calling 'get_instagram_post_media()'\n -> Post URL: {post_url}\n -> Media URL: {media_url or 'N/A'}", level='debug')
         # print(f"An error occurred: {e}")
         return None, None, None, None, None, None
     
