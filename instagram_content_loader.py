@@ -47,7 +47,7 @@ def get_instagram_post_media(shortcode):
 
     except Exception as e:
         write_log(message=f"An Exception occured when calling 'get_instagram_post_media()'\n -> {e}", level='error')
-        write_log(message=f"An Exception occured when calling 'get_instagram_post_media()'\n -> Post URL: {post_url}\n -> Media URL: {media_url or 'N/A'}", level='debug')
+        write_log(message=f"An Exception occured when calling 'get_instagram_post_media()'\n -> Post URL: {post_url}", level='debug')
         # print(f"An error occurred: {e}")
         return None, None, None, None, None, None
     
