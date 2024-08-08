@@ -32,7 +32,7 @@ async def start(update: Update, context: CallbackContext):
 
 
 async def forward_message(update: Update, context: CallbackContext):
-    write_log(level='info', message=f"Forward_message called with update: {update}")
+    write_log(level='info', message=f"forward_message called with update: {update}")
 
 
     message = update.message
