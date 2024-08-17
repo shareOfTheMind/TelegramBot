@@ -17,9 +17,6 @@ EDGE_WEBDRIVER_PATH = '/usr/local/bin/msedgedriver'  # Replace with the actual p
 INSTAGRAM_USERNAME = os.getenv('IG_USER')
 INSTAGRAM_PASSWORD = os.getenv('IG_PASS')
 
-if not INSTAGRAM_PASSWORD:
-    write_log(message=f"!! No Instagram Password Supplied for Session Generation !!", level='warning')
-    raise ValueError('NO INSTAGRAM PASSWORD SUPPLIED')
 
 
 def generate_session_from_cookies() -> bool:
@@ -36,6 +33,11 @@ def generate_session_from_cookies() -> bool:
     driver = webdriver.Edge(service=service, options=options)
 
     try:
+        if not INSTAGRAM_PASSWORD:
+            write_log(message=f"!! No Instagram Password Supplied for Session Generation !!", level='warning')
+            raise ValueError('NO INSTAGRAM PASSWORD SUPPLIED')
+        
+        
         write_log(message="Using WebDriver to Access Instagram Login Page..", level='info')
         # Open Instagram login page
         driver.get('https://www.instagram.com/accounts/login/')

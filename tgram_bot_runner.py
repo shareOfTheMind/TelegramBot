@@ -5,6 +5,9 @@ import random
 import traceback
 
 from dotenv import load_dotenv
+# load environment variables
+load_dotenv()
+
 from telegram import Update, InputFile
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, CallbackContext
 
@@ -14,8 +17,6 @@ from tgram_bot_logger import setup_logger, write_log, remove_old_logs
 # setup logging
 bot_logger = setup_logger(level=10) # debug level logging
 
-# load environment variables
-load_dotenv()
 api_token = os.getenv('API_KEY')
 # chan_id = int(os.getenv('DEV_ID'))
 chan_id = int(os.getenv('DEST_CHAN_ID'))
