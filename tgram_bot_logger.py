@@ -108,6 +108,8 @@ def write_log(level: str, message: str):
 
 
 def remove_old_logs(days=log_retention_days):
+    if current_logger:
+        write_log(message="Removing old logfiles...", level='info')
     cutoff_date = datetime.now() - timedelta(days=days)
     for root, dirs, files in os.walk(log_directory):
         for file in files:
