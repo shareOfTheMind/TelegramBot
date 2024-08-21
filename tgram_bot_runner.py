@@ -29,11 +29,11 @@ DESTINATION_CHANNEL_ID = chan_id
 # context = None
 
 async def start(update: Update, context: CallbackContext):
-    await update.message.reply_text('Welcome! Rohan OWNS YOUR SOUL --> Send me any text, video, or link, and I\'ll forward it to the channel.')
+    await update.message.reply_text("Send me any text, video, or Instagram link, and I'll forward the media and meta-data to @mindvirusfeed. Slides ot Stories coming soon!")
 
 
 async def forward_message(update: Update, context: CallbackContext):
-    write_log(level='info', message=f"Forward_message called with update: {update}")
+    write_log(level='info', message=f"forward_message called with update: {update}")
 
 
     message = update.message

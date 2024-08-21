@@ -3,17 +3,14 @@ import requests
 import os
 import time
 
+from instaloader import ConnectionException, Instaloader
 from generate_session_from_cookie import generate_session_from_cookies
 from tgram_bot_logger import write_log
-# from dotenv import load_dotenv
 
-# load_dotenv()
 
 path_to_session = os.getenv('SESSION_PATH')
 
 def get_instagram_post_media(shortcode):
-
-    attempts = 0
 
     # Initialize Instaloader
     loader = instaloader.Instaloader()
@@ -30,7 +27,7 @@ def get_instagram_post_media(shortcode):
         post_url = f"https://www.instagram.com/p/{shortcode}/"
 
         # Load post by shortcode
-        post = instaloader.Post.from_shortcode(loader.context, shortcode)
+        post = fetch_post_data(loader, shortcode)
 
         # if post is a video, return the video url; else return the photo
         if post.is_video:
@@ -38,22 +35,10 @@ def get_instagram_post_media(shortcode):
         else:
             media_url = post.url
 
-        while attempts < 3:
-            write_log(message=f"Make GraphQL Request to Instagram Resources with Instaloader. Attempt {attempts+1} of 3..", level='info')
-            # download media content
-            response = requests.get(media_url, stream=True)
 
-            # if IG is blocking our request for some reason, we may need to regenerate an IG loader session on-the-fly from a quick login
-            if response.status_code == 401:
-                write_log(message=f"Response Status Code: 401 UNAUTHORIZED. Attempting to regenerate IG Loader Session from cookies on-the-fly..", level='warning')
-                generate_session_from_cookies()
-            else:
-                break
-            
-            attempts += 1
-            time.sleep(5)
-
-
+        write_log(message=f"Make GraphQL Request to Instagram Resources with Instaloader.", level='info')
+        # download media content
+        response = requests.get(media_url, stream=True)
         response.raise_for_status() # ensure we notice bad response that isn't unauthorized
 
         # store media content in a variable
@@ -63,11 +48,63 @@ def get_instagram_post_media(shortcode):
         return media_content, post_url, post.profile, post.is_video, post.likes, post.video_view_count
 
     except Exception as e:
-        write_log(message=f"An Exception occured when calling 'get_instagram_post_media()'\n -> {e}", level='error')
-        write_log(message=f"An Exception occured when calling 'get_instagram_post_media()'\n -> Post URL: {post_url}\n -> Media URL: {media_url}", level='debug')
+        write_log(message=f"An Exception occured when calling 'get_instagram_post_media()'\n ---> ({type(e)}) {e}", level='error')
+        write_log(message=f"An Exception occured when calling 'get_instagram_post_media()'\n ---> Post URL: {post_url}", level='debug')
         # print(f"An error occurred: {e}")
         return None, None, None, None, None, None
     
+
+
+
+
+def fetch_post_data(loader: Instaloader, shortcode: str, max_attempts: int=3):
+    '''
+        Fetches post data from Instagram by shortcode.
+        - If 401 Unauthorized error occurs, regenerates session and tries again.
+
+
+        Returns
+            The fetched post object.
+    '''
+    attempts = 0
+    reload_session = False
+
+    while attempts < max_attempts:
+        try:
+            if reload_session:
+                loader.load_session_from_file(username='tgrambotlord', filename=path_to_session)
+                write_log(message=f"New session successfully loaded from file", level='info')
+            # Attempt to load post by shortcode
+            return instaloader.Post.from_shortcode(loader.context, shortcode)
+        
+        except ConnectionException as cex:
+            if '401' in str(cex):
+                write_log(message=f"Response Status Code: 401 UNAUTHORIZED. Attempting to regenerate IG Loader Session from cookies on-the-fly..", level='warning')
+                generate_session_from_cookies()
+                reload_session=True
+                attempts += 1
+                time.sleep(5)
+            else:
+                raise cex
+
+    raise Exception(f"Failed to fetch post data after {max_attempts} attempts.")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 # def download_instagram_post_video(shortcode):
