@@ -30,6 +30,9 @@ def generate_session_from_cookies() -> bool:
     # Initialize WebDriver
     options = webdriver.EdgeOptions()
     options.use_chromium = True
+    options.add_argument('--headless')  # Run in headless mode
+    options.add_argument('--no-sandbox')  # Disable sandbox (may be necessary)
+    options.add_argument('--disable-dev-shm-usage')  # Overcome some resource limitations
     driver = webdriver.Edge(service=service, options=options)
 
     try:
@@ -56,6 +59,26 @@ def generate_session_from_cookies() -> bool:
         # Wait for login to complete
         time.sleep(10)
 
+
+        # Check if redirected to a challenge page
+        if "challenge" in driver.current_url:
+            write_log(message="Challenge page detected. Trying to dismiss.", level='info')
+            try:
+                # Locate and click the 'Dismiss' button
+                dismiss_button = driver.find_element(By.XPATH, '//button[text()="Dismiss"]')
+                dismiss_button.click()
+                time.sleep(10)  # Wait for the action to complete
+                
+                # Verify if redirected back to the login page or another page
+                if "challenge" in driver.current_url:
+                    write_log(message="Still on the challenge page. Manual intervention may be required.", level='info')
+                else:
+                    write_log(message="Dismissed challenge successfully.", level='info')
+            except Exception as e:
+                write_log(message=f"An error occurred while trying to dismiss the challenge: {e}", level='error')
+                return False
+
+
         write_log(message='Extracting necessary cookies after logging into Instagram', level='info')
         # Extract cookies
         cookies = driver.get_cookies()
@@ -64,7 +87,8 @@ def generate_session_from_cookies() -> bool:
         necessary_cookies = {cookie['name']: cookie['value'] for cookie in cookies if cookie['name'] in ['csrftoken', 'sessionid']}
 
         if 'csrftoken' not in necessary_cookies or 'sessionid' not in necessary_cookies:
-            raise SystemExit("Required cookies not found. Please check your login process.")
+            write_log(message="Required cookies not found. Please check your login process.", level='error')
+            # raise SystemExit("Required cookies not found. Please check your login process.")
         
         # Initialize Instaloader
         instaloader = Instaloader(max_connection_attempts=1)
@@ -79,15 +103,17 @@ def generate_session_from_cookies() -> bool:
             username = instaloader.test_login()
             if not username:
                 write_log(message="Login test failed. Check your cookies and login process.", level='warning')
-                raise SystemExit("Login test failed. Check your cookies and login process.")
+                return False
+                # raise SystemExit("Login test failed. Check your cookies and login process.")
         except ConnectionException as e:
             write_log(message=f"Unkown Error Occurred during IG Loader Session Generation: {e}", level='error')
-            raise SystemExit(f"An error occurred during login: {e}")
+            return False
+            # raise SystemExit(f"An error occurred during login: {e}")
 
         # session_file = ''
         instaloader.context.username = username
         instaloader.save_session_to_file()
-        write_log("Successfully imported cookies from Edge and logged in.")
+        write_log(message="Successfully imported cookies from Edge and logged in.", level='info')
 
     except Exception as ex:
         write_log(message=f"Unkown Script error occured in Session Generation\n{ex}", level='error')
