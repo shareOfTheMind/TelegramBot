@@ -1,6 +1,8 @@
 import time
 import os
 
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 from selenium import webdriver
 from selenium.webdriver.edge.service import Service as EdgeService
 from selenium.webdriver.common.by import By
@@ -65,13 +67,20 @@ def generate_session_from_cookies() -> bool:
             write_log(message="Challenge page detected. Trying to dismiss.", level='info')
             try:
                 # Locate and click the 'Dismiss' button
-                dismiss_button = driver.find_element(By.XPATH, '//button[text()="Dismiss"]')
+                # dismiss_button = driver.find_element(By.XPATH, '//button[text()="Dismiss"]')
+
+                # Wait for the "Dismiss" button to become clickable (updated method to handle the dynamically loaded challenge modal)
+                dismiss_button = WebDriverWait(driver, 20).until(
+                    EC.element_to_be_clickable((By.XPATH, "//button/span[contains(text(), 'Dismiss')]/.."))
+                )
+
+
                 dismiss_button.click()
                 time.sleep(10)  # Wait for the action to complete
                 
                 # Verify if redirected back to the login page or another page
                 if "challenge" in driver.current_url:
-                    write_log(message="Still on the challenge page. Manual intervention may be required.", level='info')
+                    write_log(message="Still on the challenge page. Manual intervention may be required.", level='warning')
                 else:
                     write_log(message="Dismissed challenge successfully.", level='info')
             except Exception as e:
