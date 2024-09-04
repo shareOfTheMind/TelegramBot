@@ -17,7 +17,6 @@ MindVirus is a Python-powered Telegram bot designed to foster a collaborative so
 1. **Clone the Repository**:
    ```bash
    git clone https://github.com/yourusername/mindvirus-bot.git
-   cd mindvirus-bot
    ```
 
 2. **Install Dependencies**:
