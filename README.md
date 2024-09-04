@@ -35,7 +35,7 @@ MindVirus is a Python-powered Telegram bot designed to foster a collaborative so
 4. **Run the Bot**:
    Start the bot using the following command:
    ```bash
-   python bot.py
+   python tgram_bot_runner.py
    ```
 
 ## Usage
