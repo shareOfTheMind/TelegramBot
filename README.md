@@ -45,7 +45,7 @@ MindVirus is a Python-powered Telegram bot designed to foster a collaborative so
 
 ## Contributing
 
-We welcome contributions! Feel free to open issues or submit pull requests for any bugs or new features you'd like to see. Please refer to the `CONTRIBUTING.md` for guidelines on contributing.
+We welcome contributions! Feel free to open issues or submit pull requests for any bugs or new features you'd like to see. Please refer to the [`CONTRIBUTING.md`](CONTRIBUTING.md) for guidelines on contributing.
 
 ## License
 
