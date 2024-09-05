@@ -66,13 +66,28 @@ def generate_session_from_cookies() -> bool:
         if "challenge" in driver.current_url:
             write_log(message="Challenge page detected. Trying to dismiss.", level='info')
             try:
-                # Locate and click the 'Dismiss' button
+                # List of XPaths to try
+                # xpath_list = [
+                #     "//span[contains(text(), 'Dismiss')]/parent::button",
+                #     "//button[contains(., 'Dismiss')]"
+                # ]
+                # # Locate and click the 'Dismiss' button
                 # dismiss_button = driver.find_element(By.XPATH, '//button[text()="Dismiss"]')
 
-                # Wait for the "Dismiss" button to become clickable (updated method to handle the dynamically loaded challenge modal)
-                dismiss_button = WebDriverWait(driver, 20).until(
-                    EC.element_to_be_clickable((By.XPATH, "//button/span[contains(text(), 'Dismiss')]/.."))
+                # First wait for the "Dismiss" button to be visible
+                dismiss_button = WebDriverWait(driver, 30).until(
+                    EC.visibility_of_element_located((By.XPATH, "//span[contains(text(), 'Dismiss')]/parent::button"))
                 )
+                
+                # Then wait for it to be clickable
+                dismiss_button = WebDriverWait(driver, 30).until(
+                    EC.element_to_be_clickable((By.XPATH, "//span[contains(text(), 'Dismiss')]/parent::button"))
+                )
+
+                # # Wait for the "Dismiss" button to become clickable (updated method to handle the dynamically loaded challenge modal)
+                # dismiss_button = WebDriverWait(driver, 30).until(
+                #     EC.element_to_be_clickable((By.XPATH, "//button/span[contains(text(), 'Dismiss')]/.."))
+                # )
 
 
                 dismiss_button.click()
@@ -84,7 +99,7 @@ def generate_session_from_cookies() -> bool:
                 else:
                     write_log(message="Dismissed challenge successfully.", level='info')
             except Exception as e:
-                write_log(message=f"An error occurred while trying to dismiss the challenge: {e}", level='error')
+                write_log(message=f"An error occurred while trying to dismiss the challenge ({type(e)}): {e}", level='error')
                 return False
 
 
