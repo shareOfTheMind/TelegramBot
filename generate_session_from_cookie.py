@@ -71,26 +71,35 @@ def generate_session_from_cookies() -> bool:
                 #     "//span[contains(text(), 'Dismiss')]/parent::button",
                 #     "//button[contains(., 'Dismiss')]"
                 # ]
-                # # Locate and click the 'Dismiss' button
-                # dismiss_button = driver.find_element(By.XPATH, '//button[text()="Dismiss"]')
+
+                time.sleep(10)
+                # Locate and click the 'Dismiss' button
+                dismiss_button = driver.find_element(By.XPATH, '//button[text()="Dismiss"]')
+                dismiss_button.click()
+
+                time.sleep(5)
+                dismiss_button = driver.find_element(By.XPATH, '//span[contains(text(), "Dismiss")]/parent::button')
+                dismiss_button.click()
 
                 # First wait for the "Dismiss" button to be visible
-                dismiss_button = WebDriverWait(driver, 30).until(
-                    EC.visibility_of_element_located((By.XPATH, "//span[contains(text(), 'Dismiss')]/parent::button"))
-                )
+                # dismiss_button = WebDriverWait(driver, 30).until(
+                #     EC.visibility_of_element_located((By.XPATH, "//span[contains(text(), 'Dismiss')]/parent::button"))
+                # )
                 
-                # Then wait for it to be clickable
-                dismiss_button = WebDriverWait(driver, 30).until(
-                    EC.element_to_be_clickable((By.XPATH, "//span[contains(text(), 'Dismiss')]/parent::button"))
-                )
+                # # Then wait for it to be clickable
+                # dismiss_button = WebDriverWait(driver, 30).until(
+                #     EC.element_to_be_clickable((By.XPATH, "//span[contains(text(), 'Dismiss')]/parent::button"))
+                # )
 
-                # # Wait for the "Dismiss" button to become clickable (updated method to handle the dynamically loaded challenge modal)
+                # Wait for the "Dismiss" button to become clickable (updated method to handle the dynamically loaded challenge modal)
                 # dismiss_button = WebDriverWait(driver, 30).until(
                 #     EC.element_to_be_clickable((By.XPATH, "//button/span[contains(text(), 'Dismiss')]/.."))
                 # )
+                # dismiss_button = WebDriverWait(driver, 30).until(
+                #     EC.element_to_be_clickable((By.XPATH, '//button[text()="Dismiss"]'))
+                # )
 
 
-                dismiss_button.click()
                 time.sleep(10)  # Wait for the action to complete
                 
                 # Verify if redirected back to the login page or another page
