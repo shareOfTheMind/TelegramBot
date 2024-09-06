@@ -35,6 +35,7 @@ async def start(update: Update, context: CallbackContext):
 async def forward_message(update: Update, context: CallbackContext):
     write_log(level='info', message=f"forward_message called with update: {update}")
 
+    submission_message = ''
 
     message = update.message
     try:
@@ -65,7 +66,8 @@ async def forward_message(update: Update, context: CallbackContext):
                         return
                     
                     write_log(message=f"Media Was Parsed Successfully From Instagram URL", level='info')
-                    await message.reply_text("Your media was parsed successfully and is processing!")
+                    submission_message += "Your media was parsed successfully and is processing!\n"
+
                     if is_video:
                         caption_data = f"{url}\n❤️ {like_count:,}\n👀 {view_count:,}"
                         video_input = InputFile(obj=media_obj, filename=f"{profile}_{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}.mp4")
@@ -99,8 +101,11 @@ async def forward_message(update: Update, context: CallbackContext):
 
    
             # Forward other post meta-data here message to the destination channel
-            await message.reply_text(f"[Submitted]\n{random.choice(submission_phrases)}")
-            # await message.reply_text("Your submission has been forwarded to the channel.")
+            submission_message += f"[Submitted]\n{random.choice(submission_phrases)}"
+
+            submission_message += f"\nCheckout your content on the --> @mindvirusfeed"
+
+            await message.reply_text('\n'.join(submission_message))
 
         # If there is no message being forwarded (no Update message); then do nothing
         else:
