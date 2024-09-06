@@ -66,7 +66,7 @@ async def forward_message(update: Update, context: CallbackContext):
                         return
                     
                     write_log(message=f"Media Was Parsed Successfully From Instagram URL", level='info')
-                    submission_message += "Your media was parsed successfully and is processing!\n"
+                    submission_message.append("Your media was parsed successfully and is processing!\n")
 
                     if is_video:
                         caption_data = f"{url}\n❤️ {like_count:,}\n👀 {view_count:,}"
@@ -101,9 +101,9 @@ async def forward_message(update: Update, context: CallbackContext):
 
    
             # Forward other post meta-data here message to the destination channel
-            submission_message += f"[Submitted]\n{random.choice(submission_phrases)}"
+            submission_message.append(f"[Submitted]\n{random.choice(submission_phrases)}")
 
-            submission_message += f"\nCheckout your content on the --> @mindvirusfeed"
+            submission_message.append(f"\nCheckout your content on the --> @mindvirusfeed")
 
             await message.reply_text('\n'.join(submission_message))
 
