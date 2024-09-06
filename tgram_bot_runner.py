@@ -35,7 +35,7 @@ async def start(update: Update, context: CallbackContext):
 async def forward_message(update: Update, context: CallbackContext):
     write_log(level='info', message=f"forward_message called with update: {update}")
 
-    submission_message = ''
+    submission_message = []
 
     message = update.message
     try:
