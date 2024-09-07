@@ -20,7 +20,10 @@ def get_instagram_post_media(shortcode):
     loader = instaloader.Instaloader()
     # if we're in the right environment, then load the session; else we good
     if path_to_session:
-        loader.load_session_from_file(username='tgrambotlord', filename=path_to_session)
+        try:
+            loader.load_session_from_file(username='tgrambotlord', filename=path_to_session)
+        except FileNotFoundError as exF:
+            regenerate_session()
         write_log(message="Successfully loaded IG session from file", level='info')
     else:
         write_log(message="No IG session path found in environment.. Continuing to complete request with Instaloader..", level='warning')
