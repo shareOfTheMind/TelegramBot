@@ -72,20 +72,12 @@ def generate_session_from_cookies() -> bool:
                 #     "//button[contains(., 'Dismiss')]"
                 # ]
 
-                # time.sleep(10)
-                # # Locate and click the 'Dismiss' button
-                # dismiss_button = driver.find_element(By.XPATH, '//button[text()="Dismiss"]')
-                # dismiss_button.click()
-
-                # time.sleep(5)
-                # dismiss_button = driver.find_element(By.XPATH, '//span[contains(text(), "Dismiss")]/parent::button')
-                # dismiss_button.click()
-
                 # First wait for the "Dismiss" button to be visible
                 # dismiss_button = WebDriverWait(driver, 30).until(
                 #     EC.visibility_of_element_located((By.XPATH, "//span[contains(text(), 'Dismiss')]/parent::button"))
                 # )
                 
+
                 # Wait for the "Dismiss" button to become clickable (updated method to handle the dynamically loaded challenge modal)
                 dismiss_button = WebDriverWait(driver, 20).until(
                     EC.element_to_be_clickable((By.XPATH, "//button/span[contains(text(), 'Dismiss')]/.."))
@@ -93,8 +85,6 @@ def generate_session_from_cookies() -> bool:
 
 
                 dismiss_button.click()
-                time.sleep(10)  # Wait for the action to complete
-
                 # Wait for the "Dismiss" button to become clickable (updated method to handle the dynamically loaded challenge modal)
                 # dismiss_button = WebDriverWait(driver, 30).until(
                 #     EC.element_to_be_clickable((By.XPATH, "//button/span[contains(text(), 'Dismiss')]/.."))
@@ -104,7 +94,11 @@ def generate_session_from_cookies() -> bool:
                 # )
 
 
+
                 # time.sleep(10)  # Wait for the action to complete
+
+                time.sleep(10)  # Wait for the action to complete
+
                 
                 # Verify if redirected back to the login page or another page
                 if "challenge" in driver.current_url:
