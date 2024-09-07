@@ -106,7 +106,9 @@ def generate_session_from_cookies() -> bool:
                 else:
                     write_log(message="Dismissed challenge successfully.", level='info')
             except Exception as e:
-                write_log(message=f"An error occurred while trying to dismiss the challenge ({type(e)}): {e}", level='error')
+                write_log(message=f"An error occurred while trying to dismiss the challenge ({type(e)})", level='error')
+                write_log(message=f"Page returned as PDF for Anaylsis ({driver.print_page()}", level='debug')
+                # write_log(message=f"Here is the page source code for the challenge {driver.page_source}.", level='error')
                 return False
 
 
