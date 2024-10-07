@@ -39,11 +39,10 @@ def parse_instagram_data(post_url: str) -> dict:
         'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36'
     }
     
+    cookie_session = read_cookies_from_file()
 
     if not cookie_session:
         generate_cookies()
-
-    cookie_session = read_cookies_from_file()
 
     # Send a GET request to the Instagram JSON endpoint
     response = requests.get(json_url, headers=headers, cookies=cookie_session)
