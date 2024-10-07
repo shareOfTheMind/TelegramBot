@@ -99,12 +99,15 @@ def parse_instagram_data(post_url: str) -> dict:
             views    = post_data.get('video_view_count', None)
         else:
             post_data = data['items'][0]  # The JSON structure for a REEL
+            is_video = post_data['media_type'] != 1
 
-            cdn_link = post_data['video_versions'][0]['url']
+            if is_video:
+                cdn_link = post_data['video_versions'][0]['url']
+            else:
+                cdn_link = post_data['image_versions2']['candidates'][0]['url']
 
             likes    = post_data['like_count']
-            views    = post_data['play_count']
-            is_video = True
+            views    = post_data.get('play_count', 0)
 
         return {
             'cdn_link': cdn_link,
