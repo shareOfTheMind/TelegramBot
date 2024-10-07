@@ -4,29 +4,24 @@ import gc
 import random
 import traceback
 
-from dotenv import load_dotenv
-# load environment variables
-load_dotenv()
-
 from telegram import Update, InputFile
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, CallbackContext
 
-from tgram_bot_helper import *
-from tgram_bot_logger import setup_logger, write_log, remove_old_logs
+from modules.tgram_bot_helper import *
+from config.tgram_bot_logger import setup_logger, write_log, remove_old_logs
+from modules import DESTINATION_CHANNEL_ID, TOKEN
 
 # setup logging
 bot_logger = setup_logger(level=10) # debug level logging
 
-api_token = os.getenv('API_KEY')
-# chan_id = int(os.getenv('DEV_ID'))
-chan_id = int(os.getenv('DEST_CHAN_ID'))
 
-# Replace 'YOUR_BOT_TOKEN' with the token you get from BotFather
-TOKEN = api_token
-# Replace 'DESTINATION_CHANNEL_ID' with the ID of @mindvirusfeed channel
-DESTINATION_CHANNEL_ID = chan_id
 
-# context = None
+
+
+
+
+
+
 
 async def start(update: Update, context: CallbackContext):
     await update.message.reply_text("Send me any text, video, or Instagram link, and I'll forward the media and meta-data to @mindvirusfeed. Slides ot Stories coming soon!")
@@ -130,6 +125,11 @@ async def forward_message(update: Update, context: CallbackContext):
         write_log(message=f"Error traceback\n\n{'\n'.join(traceback_details)}\n\n", level='debug')
 
         await message.reply_text("Sorry, there was an error forwarding your submission.")
+
+
+
+
+
 
 
 
