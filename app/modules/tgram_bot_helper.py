@@ -1,7 +1,7 @@
 import re
 
 from telegram import Message
-from instagram_content_loader import get_instagram_post_media
+from .instagram_content_loader import get_instagram_post_media
 
 
 submission_phrases = [

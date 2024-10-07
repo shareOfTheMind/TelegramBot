@@ -12,7 +12,7 @@ httpcore==1.0.5
 httpx==0.27.0
 identify==2.6.0
 idna==3.7
-instaloader==4.12
+instaloader==4.13.1
 nodeenv==1.9.1
 outcome==1.3.0.post0
 platformdirs==4.2.2
