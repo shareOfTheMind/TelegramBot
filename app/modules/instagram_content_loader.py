@@ -1,7 +1,7 @@
 import requests
 
 from config.tgram_bot_logger import write_log
-
+from generate_cookies import generate_cookies, read_cookies_from_file
 
 
 
@@ -29,7 +29,8 @@ def get_instagram_post_media(shortcode: str) -> tuple[bytes, str, str, bool, int
 
 
 
-
+# NOTE: requests session logic should be implemented here in a cunning way to avoid logging in every request
+# sessions would ideally be managed by time-interval, user-activity, and request limits to avoid IG api backlash
 def parse_instagram_data(post_url: str) -> dict:
     # Modify the URL to fetch the JSON data
     json_url = post_url + '?__a=1&__d=dis'
@@ -38,10 +39,19 @@ def parse_instagram_data(post_url: str) -> dict:
         'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36'
     }
     
-    cookie_session = {'csrftoken': 'AvkK25Z8LF8ByJ2a0fqDzcwEPbzfviSS',
-                      'sessionid': '68271857052%3Aq5VqJ3DnEU5bHi%3A18%3AAYc7yrskotvO1OwgFgVmGVGtbrXzDEE-ztJ655XYZQ'}
+
+    if not cookie_session:
+        generate_cookies()
+
+    cookie_session = read_cookies_from_file()
+
     # Send a GET request to the Instagram JSON endpoint
     response = requests.get(json_url, headers=headers, cookies=cookie_session)
+
+    # if the error is some type of auth error, generate new cookies and try again
+    if response.status_code >= 400:
+        cookie_session = generate_cookies()
+        response = requests.get(json_url, headers=headers, cookies=cookie_session)
 
     # Check if the request was successful
     if response.status_code != 200:
