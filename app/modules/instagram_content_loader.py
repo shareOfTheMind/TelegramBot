@@ -1,7 +1,7 @@
 import requests
 
 from config.tgram_bot_logger import write_log
-from generate_cookies import generate_cookies, read_cookies_from_file
+from .generate_cookies import generate_cookies, read_cookies_from_file
 
 
 
