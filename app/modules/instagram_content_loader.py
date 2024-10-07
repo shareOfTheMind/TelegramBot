@@ -3,12 +3,13 @@ import requests
 
 from config.tgram_bot_logger import write_log
 
-# Create an Event to coordinate the session generation
-session_generation_event = threading.Event()
-session_generation_lock = threading.Lock()
-session_generation_in_progress = False
 
-def get_instagram_post_media(shortcode) -> tuple[bytes, str, str, bool, int, int]:
+
+
+
+
+
+def get_instagram_post_media(shortcode: str) -> tuple[bytes, str, str, bool, int, int]:
 
     try:
         post_url = f"https://www.instagram.com/p/{shortcode}/"
