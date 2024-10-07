@@ -8,7 +8,7 @@ import platform
 # Script-level variables
 log_directory = '/var/log/tgram_bot_logging'
 log_file = os.path.join(log_directory, f'{datetime.now().strftime("%y-%m-%d_%T")}.log')
-log_retention_days = 30
+log_retention_days = 15
 current_logger: Logger = None
 
 
