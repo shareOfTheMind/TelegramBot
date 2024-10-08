@@ -121,3 +121,6 @@ def parse_instagram_data(post_url: str) -> dict:
     except KeyError as e:
         write_log(message=f"KeyError accessing JSON data: {e}", level='error')
         return None
+    except Exception as ex:
+        write_log(message=f"An unexpected error occurred in 'parse_instagram_data()':\n --->\n\t{type(ex)}\n\t{ex}\n\tStatus Code: {response.status_code if response else 'Unknown'}", level='error')
+        return None
