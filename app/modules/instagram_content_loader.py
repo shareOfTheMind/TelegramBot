@@ -3,7 +3,7 @@ import requests
 from config.tgram_bot_logger import write_log
 from .generate_cookies import generate_cookies, read_cookies_from_file
 
-
+retry_count = 0
 
 
 
@@ -122,5 +122,12 @@ def parse_instagram_data(post_url: str) -> dict:
         write_log(message=f"KeyError accessing JSON data: {e}", level='error')
         return None
     except Exception as ex:
-        write_log(message=f"An unexpected error occurred in 'parse_instagram_data()':\n --->\n\t{type(ex)}\n\t{ex}\n\tStatus Code: {response.status_code if response else 'Unknown'}", level='error')
+        global retry_count
+
+        write_log(message=f"An unexpected error occurred in 'parse_instagram_data()':\n\t--->{type(ex)}\n\t---> {ex}\n\t---> Request Status Code: {response.status_code if response else 'Unknown'}", level='error')
+        if 'challenge' in response.url and retry_count < 3:
+            write_log(message=f"Detected Instagram challenge. Generating new cookies. Retry Count {retry_count+1}", level='warning')
+            retry_count += 1
+            generate_cookies()
+            parse_instagram_data(post_url=post_url)
         return None
