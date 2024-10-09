@@ -36,8 +36,7 @@ RUN python -m venv $VENV_DIR && \
     $VENV_DIR/bin/pip install -r requirements.txt
 
 # Ensure correct permissions on the virtual environment and project files
-RUN chmod +x $APP_DIR/deploy.sh && \
-    chmod 644 $APP_DIR/cookie_info.txt && \
+RUN chmod 644 $APP_DIR/cookie_info.txt && \
     chown -R deployuser:deployuser $APP_DIR
 
 # Ensure that persistent logging is mapped to the host system
