@@ -10,26 +10,47 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # Checkout code
       - name: Checkout code
         uses: actions/checkout@v2
 
+      # Set up SSH to authenticate to the server
       - name: Set up SSH
         uses: webfactory/ssh-agent@v0.5.3
         with:
           ssh-private-key: ${{ secrets.TG_DEPLOY_SSH_KEY }}
 
+      # Add known hosts for SSH
       - name: Add known hosts
         run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.TG_PROD_SERVER_HOST_KEY }}" >> ~/.ssh/known_hosts
 
-      - name: Create tarball of files respecting .gitignore
-        run: |
-          git archive --format=tar.gz HEAD -o /tmp/deploy.tar.gz
+      # Log in to Docker Hub (or GitHub Container Registry, or any container registry you're using)
+      - name: Log in to Docker Hub
+        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
 
-      - name: Copy tarball to VPS
-        run: scp /tmp/deploy.tar.gz deployuser@${{ secrets.TG_PROD_SERVER }}:/srv/telegram_service
+      # Build the Docker image
+      - name: Build Docker image
+        run: docker build -t "${{ secrets.DOCKER_USERNAME }}"/telegram_bot_app:latest .
 
-      - name: SSH into VPS and deploy
+      # Push Docker image to Docker Hub
+      - name: Push Docker image
+        run: docker push "${{ secrets.DOCKER_USERNAME }}"/telegram_bot_app:latest
+
+      # SSH into VPS and pull the latest Docker image, stop old container, and start the new one
+      - name: Deploy container to VPS
         run: |
-          ssh deployuser@${{ secrets.TG_PROD_SERVER }} 'cd /srv/telegram_service && tar -xzf deploy.tar.gz && ./deploy.sh'
+          ssh deployuser@${{ secrets.TG_PROD_SERVER }} << 'EOF'
+            docker pull "${{ secrets.DOCKER_USERNAME }}"/telegram_bot_app:latest
+            docker stop telegram_bot_container || true
+            docker rm telegram_bot_container || true
+            docker run -d \
+              --name telegram_bot_container \
+              -v /var/log/tgram_bot_logging:/var/log/tgram_bot_logging \
+              -v /srv/telegram_service/app/config/.env:/srv/telegram_service/app/config/.env \
+              -v /srv/telegram_service/deploy.sh:/srv/telegram_service/deploy.sh \
+              -v /srv/telegram_service/cookie_info.txt:/srv/telegram_service/cookie_info.txt \
+              --restart unless-stopped \
+              "${{ secrets.DOCKER_USERNAME }}"/telegram_bot_app:latest
+          EOF
