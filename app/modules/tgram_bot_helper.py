@@ -95,7 +95,7 @@ def contains_tiktok_link(text: str) -> bool:
     '''
 
     # already escaped so we dont need the "r" string specifier
-    pattern = "^https:\/\/www\.tiktok\.com\/@[\w\.]+\/video\/\d+"
+    pattern = "^https:\/\/www\.tiktok\.com\/(?:@[\w.]+\/video\/\d+|t\/[\w]+)\/?$"
 
     match = re.search(pattern, text)
     return match is not None
