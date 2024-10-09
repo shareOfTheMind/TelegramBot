@@ -85,3 +85,16 @@ def contains_instagram_link(text: str) -> bool:
     
     # Return True if a match is found, otherwise False
     return match is not None
+
+
+
+def contains_tiktok_link(text: str) -> bool:
+    '''
+        Function to return whether the provided string is a tiktok share link
+    '''
+
+    # already escaped so we dont need the "r" string specifier
+    pattern = "^https:\/\/(?:m|www|vm)?\.?tiktok\.com\/(?:.*\b(?:usr|v|embed|user|video)\/\d+|\w+)"
+
+    match = re.search(pattern, text)
+    return match is not None
