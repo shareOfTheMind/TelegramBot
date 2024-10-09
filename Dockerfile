@@ -28,4 +28,4 @@ RUN python -m venv $VENV_DIR && \
 VOLUME ["$LOG_DIR", "$CONFIG_DIR/.env"]
 
 # Command to start our application
-CMD ["python", "$APP_DIR/app/tgram_bot_runner.py"]
+CMD python $APP_DIR/app/tgram_bot_runner.py
