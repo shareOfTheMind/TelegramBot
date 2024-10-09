@@ -14,9 +14,6 @@ RUN mkdir -p $APP_DIR $LOG_DIR $CONFIG_DIR
 # Set working directory
 WORKDIR $APP_DIR
 
-# Copy deploy.sh from the host to the container
-COPY deploy.sh /srv/telegram_service/deploy.sh
-
 # Install necessary packages
 RUN apt-get update && \
     apt-get install -y sudo && \
@@ -45,7 +42,7 @@ RUN chown -R deployuser:deployuser $APP_DIR
 VOLUME ["$LOG_DIR", "$CONFIG_DIR/.env"]
 
 # Switch to deployuser
-USER deployuser
+# USER deployuser
 
 # Command to run the deploy.sh script
-CMD ["bash", "$APP_DIR/deploy.sh"]
+# CMD ["bash", "$APP_DIR/deploy.sh"]
