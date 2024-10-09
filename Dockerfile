@@ -11,18 +11,10 @@ ENV CONFIG_DIR=$APP_DIR/app/config
 # Set working directory
 WORKDIR $APP_DIR
 
-# Install necessary packages
-RUN apt-get update && \
-    apt-get install -y sudo && \
-    apt-get clean && rm -rf /var/lib/apt/lists/*
-
 # Copy application files
 COPY . $APP_DIR/
 
-# Create the virtual environment and install dependencies
-RUN python -m venv $VENV_DIR && \
-    $VENV_DIR/bin/pip install --upgrade pip && \
-    $VENV_DIR/bin/pip install -r requirements.txt
+RUN pip install -r requirements.txt
 
 # Ensure that persistent logging is mapped to the host system
 VOLUME ["$LOG_DIR", "$CONFIG_DIR/.env"]
