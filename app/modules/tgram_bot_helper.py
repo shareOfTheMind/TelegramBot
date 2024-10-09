@@ -2,6 +2,7 @@ import re
 
 from telegram import Message
 from .instagram_content_loader import get_instagram_post_media
+from config.tgram_bot_logger import write_log
 
 
 submission_phrases = [
@@ -98,3 +99,26 @@ def contains_tiktok_link(text: str) -> bool:
 
     match = re.search(pattern, text)
     return match is not None
+
+
+def read_cookies_from_file(path:str) -> dict:
+    '''
+        Reads cookies from a file and returns them as a dictionary. 
+
+        path: the path to the cookie info file. currently should only be: 
+                'instagram_cookie_info.txt'
+                'tiktok_cookie_info.txt'
+    '''
+
+    cookies = {}
+    try:
+        with open(path, 'r') as f:
+            for line in f:
+                line = line.strip()  # Remove any surrounding whitespace or newline characters
+                if '=' in line:  # Ensure the line has the correct format
+                    name, value = line.split('=', 0)  # Split only at the first '='
+                    cookies[name] = value
+    except FileNotFoundError:
+        write_log(message=f"Cookie file '{path}' not found. Please generate cookies first.", level='error')
+
+    return cookies

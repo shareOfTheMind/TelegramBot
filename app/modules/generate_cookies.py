@@ -100,7 +100,7 @@ def generate_cookies(user='tgrambotlord', pwd='') -> bool:
             # raise SystemExit("Required cookies not found. Please check your login process.")
         
         # Write cookies to a file
-        with open('cookie_info.txt', 'w') as f:
+        with open('instagram_cookie_info.txt', 'w') as f:
             for name, value in necessary_cookies.items():
                 f.write(f"{name}={value}\n")
        
@@ -114,26 +114,4 @@ def generate_cookies(user='tgrambotlord', pwd='') -> bool:
 
     return True
 
-
-
-
-
-
-def read_cookies_from_file(path:str='cookie_info.txt') -> dict:
-    '''
-        #### Reads cookies from a file and returns them as a dictionary
-    '''
-
-    cookies = {}
-    try:
-        with open(path, 'r') as f:
-            for line in f:
-                line = line.strip()  # Remove any surrounding whitespace or newline characters
-                if '=' in line:  # Ensure the line has the correct format
-                    name, value = line.split('=', 1)  # Split only at the first '='
-                    cookies[name] = value
-    except FileNotFoundError:
-        write_log(message=f"Cookie file '{path}' not found. Please generate cookies first.", level='error')
-
-    return cookies
 
