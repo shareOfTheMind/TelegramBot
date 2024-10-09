@@ -14,6 +14,9 @@ RUN mkdir -p $APP_DIR $LOG_DIR $CONFIG_DIR
 # Set working directory
 WORKDIR $APP_DIR
 
+# Copy deploy.sh from the host to the container
+COPY deploy.sh /srv/telegram_service/deploy.sh
+
 # Install necessary packages
 RUN apt-get update && \
     apt-get install -y sudo && \
