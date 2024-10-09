@@ -7,3 +7,4 @@ iasumico*
 .env
 .vscode
 tgram_bot.py
+deploy.sh
