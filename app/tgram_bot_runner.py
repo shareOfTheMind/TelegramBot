@@ -77,6 +77,28 @@ async def forward_message(update: Update, context: CallbackContext):
                     media_obj = None
                     gc.collect()
 
+                ### TODO: We might want to consolidate the logic between tiktok and insta links
+                elif contains_tiktok_link(msg_text):
+                    write_log(message=f"TikTok Link URL Found Within Message Text", level='info')
+
+                    media_obj, url, profile, is_video, like_count, view_count = get_media_from_tiktok_post(msg_text)
+                    if not media_obj:
+                        write_log(message=f"Media Not Parsed Successfully", level='warning')
+                        await message.reply_text("Failed to download media from TikTok post.")
+                        return
+                    
+                    write_log(message=f"Media Was Parsed Successfully From TikTok URL", level='info')
+                    submission_message.append("Your media was parsed successfully and is processing!\n")
+
+                    caption_data = f"{url}\n❤️ {like_count:,}\n👀 {view_count:,}"
+                    video_input = InputFile(obj=media_obj, filename=f"{profile}_{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}.mp4")
+                    await context.bot.send_video(chat_id=DESTINATION_CHANNEL_ID, video=video_input, caption=caption_data, supports_streaming=True)
+                    
+                    # free memory after sending it to tg channel server
+                    # del media_obj
+                    media_obj = None
+                    gc.collect()
+
                 # if the message does not contain an instagram link
                 else:
                     await message.forward(chat_id=DESTINATION_CHANNEL_ID)
