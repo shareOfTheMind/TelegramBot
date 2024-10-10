@@ -24,7 +24,7 @@ RUN echo "[INFO] $(date '+%Y-%m-%d %H:%M:%S') - Installing Required Dependencies
     apt-get update && \
     apt-get install -y gpg wget gnupg apt-transport-https unzip && \
     apt-get clean && \
-    echo "Dependencies installed successfully" || log "Failed to install dependencies"
+    && echo "[INFO] $(date '+%Y-%m-%d %H:%M:%S') - Dependencies installed successfully" >> "$LOG_FILE" || echo "[ERROR] $(date '+%Y-%m-%d %H:%M:%S') - Failed to install dependencies" >> "$LOG_FILE"
 
 # Add the Microsoft GPG key and run installation/add repo; Install Microsoft Edge
 RUN echo "[INFO] $(date '+%Y-%m-%d %H:%M:%S') - Installing Microsoft Edge" >> "$LOG_FILE" && \
