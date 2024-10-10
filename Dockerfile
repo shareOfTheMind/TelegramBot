@@ -13,6 +13,7 @@ WORKDIR $APP_DIR
 
 # Install required packages for downloading and installing Microsoft Edge
 RUN apt-get update && apt-get install -y \
+    gpg \
     wget \
     gnupg \
     apt-transport-https \
