@@ -38,10 +38,10 @@ RUN wget -q https://msedgedriver.azureedge.net/129.0.2792.86/edgedriver_linux64.
 COPY . $APP_DIR/
 
 # Install Python dependencies
-RUN pip install -r requirements.txt
+RUN pip install -r requirements.txt && pip install debugpy
 
 # Ensure that persistent logging is mapped to the host system
 VOLUME ["$LOG_DIR", "$CONFIG_DIR/.env"]
 
 # Command to start our application
-CMD python $APP_DIR/app/tgram_bot_runner.py
+CMD ["python", "/srv/telegram_service/app/tgram_bot_runner.py"]

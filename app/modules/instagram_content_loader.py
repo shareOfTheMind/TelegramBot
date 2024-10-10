@@ -28,12 +28,12 @@ def get_instagram_post_media(shortcode: str) -> tuple[bytes, str, str, bool, int
 
         media_content = response.content
 
-        return media_content, post_url, media_data['owner'], media_data['is_video'], media_data['likes'], media_data['views']
+        return media_content, post_url, media_data['owner'], media_data['is_video'], media_data['likes'], media_data['views'], media_data['is_carousel']
 
     except Exception as e:
         write_log(message=f"An Exception occurred when calling 'get_instagram_post_media()'\n ---> ({type(e)}) {e}", level='error')
         write_log(message=f"An Exception occurred when calling 'get_instagram_post_media()'\n ---> Post URL: {post_url}", level='debug')
-        return None, None, None, None, None, None
+        return None, None, None, None, None, None, None
 
 
 def parse_instagram_data(post_url: str) -> dict:
@@ -46,7 +46,7 @@ def parse_instagram_data(post_url: str) -> dict:
     cookie_session = read_cookies_from_file()
 
     if not cookie_session:
-        cookie_session = generate_cookies()
+        generate_cookies()
 
     # Update session with the retrieved cookies
     session.cookies.update(cookie_session)
@@ -82,15 +82,36 @@ def parse_instagram_data(post_url: str) -> dict:
             likes    = post_data['edge_media_preview_like']['count']
             views    = post_data.get('video_view_count', None)
         else:
-            post_data = data['items'][0]  
-            is_video = post_data['media_type'] != 1
+            post_data = data['items'][0]
+            post_owner = post_data['owner']['username']
+            # carasoul check
+            is_carousel_item = 'carousel' in post_data.get('product_type')
 
-            if is_video:
-                cdn_link = post_data['video_versions'][0]['url']
+
+            if is_carousel_item:
+                likes = post_data['like_count']
+
+                all_media = post_data['carousel_media']
+                post_data = all_media[0] # take the first item because we don't have a way to select carousel data right now from bot interface
+
+                is_video = post_data['media_type'] != 1
+
+                if is_video:
+                    cdn_link = post_data['video_versions'][0]['url']
+                else:
+                    cdn_link = post_data['image_versions2']['candidates'][0]['url']
+            # all other media that is not a carousel item
             else:
-                cdn_link = post_data['image_versions2']['candidates'][0]['url']
+                is_video = post_data['media_type'] != 1
 
-            likes    = post_data['like_count']
+                if is_video:
+                    cdn_link = post_data['video_versions'][0]['url']
+                else:
+                    cdn_link = post_data['image_versions2']['candidates'][0]['url']
+
+                likes    = post_data['like_count']
+
+
             views    = post_data.get('play_count', 0)
 
         return {
@@ -98,7 +119,8 @@ def parse_instagram_data(post_url: str) -> dict:
             'is_video': is_video,
             'likes': likes,
             'views': views,
-            'owner': post_data['owner']['username']  
+            'owner': post_owner,
+            'is_carousel': is_carousel_item
         }
 
     except KeyError as e:
