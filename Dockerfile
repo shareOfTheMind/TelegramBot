@@ -21,7 +21,7 @@ RUN apt-get update && apt-get install -y \
 
 # Add Microsoft Edge GPG key and repository
 RUN wget -qO - https://packages.microsoft.com/keys/microsoft.asc | apt-key add - \
-    && echo "deb [arch=amd64] https://packages.microsoft.com/debian/ bookworm main" > /etc/apt/sources.list.d/microsoft-edge.list
+    && echo "deb [arch=amd64] https://packages.microsoft.com/debian bullseye main" > /etc/apt/sources.list.d/microsoft-edge.list
 
 # Update package lists and install Microsoft Edge
 RUN apt-get update && apt-get install -y microsoft-edge-stable
@@ -33,7 +33,7 @@ RUN wget -q https://msedgedriver.azureedge.net/LATEST_STABLE/LATEST -O msedgedri
     && unzip msedgedriver_linux64.zip -d /usr/local/bin/ \
     && chmod +x /usr/local/bin/msedgedriver \
     && rm msedgedriver_version msedgedriver_linux64.zip
-
+    
 # Copy application files
 COPY . $APP_DIR/
 
