@@ -20,14 +20,14 @@ RUN touch "$LOG_FILE" && \
     echo "[INFO] $(date '+%Y-%m-%d %H:%M:%S') - Starting the build process" >> "$LOG_FILE"
 
 # Install required packages for downloading and installing Microsoft Edge
-RUN echo "[INFO] $(date '+%Y-%m-%d %H:%M:%S') - Installing Required Dependencies" >> "$LOG_FILE" \
+RUN echo "[INFO] $(date '+%Y-%m-%d %H:%M:%S') - Installing Required Dependencies" >> "$LOG_FILE" && \
     apt-get update && \
     apt-get install -y gpg wget gnupg apt-transport-https unzip && \
     apt-get clean && \
     echo "Dependencies installed successfully" || log "Failed to install dependencies"
 
 # Add the Microsoft GPG key and run installation/add repo; Install Microsoft Edge
-RUN echo "[INFO] $(date '+%Y-%m-%d %H:%M:%S') - Installing Microsoft Edge" >> "$LOG_FILE" \
+RUN echo "[INFO] $(date '+%Y-%m-%d %H:%M:%S') - Installing Microsoft Edge" >> "$LOG_FILE" && \
     wget -qO- https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor | tee /etc/apt/trusted.gpg.d/microsoft.gpg > /dev/null && \
     echo "deb [arch=amd64] https://packages.microsoft.com/repos/edge stable main" | tee /etc/apt/sources.list.d/microsoft-edge-dev.list && \
     apt-get update && \
@@ -35,7 +35,7 @@ RUN echo "[INFO] $(date '+%Y-%m-%d %H:%M:%S') - Installing Microsoft Edge" >> "$
     && echo "[INFO] $(date '+%Y-%m-%d %H:%M:%S') - Microsoft Edge installed successfully" >> "$LOG_FILE" || echo "[ERROR] $(date '+%Y-%m-%d %H:%M:%S') - Failed to install Microsoft Edge" >> "$LOG_FILE"
 
 # Download the specific version of msedgedriver
-RUN echo "[INFO] $(date '+%Y-%m-%d %H:%M:%S') - Installing Edge WebDriver" >> "$LOG_FILE" \
+RUN echo "[INFO] $(date '+%Y-%m-%d %H:%M:%S') - Installing Edge WebDriver" >> "$LOG_FILE" && \
     wget -q https://msedgedriver.azureedge.net/129.0.2792.86/edgedriver_linux64.zip -O /tmp/edgedriver_linux64.zip && \
     unzip /tmp/edgedriver_linux64.zip -d /usr/local/bin/ && \
     chmod +x /usr/local/bin/msedgedriver && \
@@ -49,7 +49,7 @@ RUN echo "[INFO] $(date '+%Y-%m-%d %H:%M:%S') - Generating Application Files" >>
 COPY . $APP_DIR/
 
 # Log before installing Python packages
-RUN echo "[INFO] $(date '+%Y-%m-%d %H:%M:%S') - Installing Python Packages" >> "$LOG_FILE" \
+RUN echo "[INFO] $(date '+%Y-%m-%d %H:%M:%S') - Installing Python Packages" >> "$LOG_FILE" && \
     pip install -r requirements.txt && \
     pip install debugpy && \
     && echo "[INFO] $(date '+%Y-%m-%d %H:%M:%S') - Python packages installed successfully" >> "$LOG_FILE" || echo "[ERROR] $(date '+%Y-%m-%d %H:%M:%S') - Failed to install Python packages" >> "$LOG_FILE"
