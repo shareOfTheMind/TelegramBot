@@ -15,6 +15,7 @@ from . import IG_PASS
 # Path to Edge WebDriver executable
 EDGE_WEBDRIVER_PATH = '/usr/local/bin/msedgedriver'  # Replace with the actual path to your msedgedriver.exe
 
+source_page_filepath = '/srv/telegram_service/source_page'
 
 
 def generate_cookies(user='tgrambotlord', pwd='') -> bool:
@@ -83,8 +84,10 @@ def generate_cookies(user='tgrambotlord', pwd='') -> bool:
                     write_log(message="Dismissed challenge successfully.", level='info')
             except Exception as e:
                 write_log(message=f"An error occurred while trying to dismiss the challenge ({type(e)})", level='error')
-                write_log(message=f"Page returned as PDF for Anaylsis ({driver.print_page()}", level='debug')
-                # write_log(message=f"Here is the page source code for the challenge {driver.page_source}.", level='error')
+                html_source = driver.page_source
+                with open(f'{source_page_filepath}/challenge_page_source.html', 'r') as file:
+                    file.write(html_source)
+                write_log(message=f"Page source saved to file for Anaylsis at '{source_page_filepath}'", level='debug')
                 return False
 
 
