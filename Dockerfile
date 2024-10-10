@@ -24,7 +24,7 @@ RUN echo "[INFO] $(date '+%Y-%m-%d %H:%M:%S') - Installing Required Dependencies
     apt-get update && \
     apt-get install -y gpg wget gnupg apt-transport-https unzip && \
     apt-get clean && \
-    && echo "[INFO] $(date '+%Y-%m-%d %H:%M:%S') - Dependencies installed successfully" >> "$LOG_FILE" || echo "[ERROR] $(date '+%Y-%m-%d %H:%M:%S') - Failed to install dependencies" >> "$LOG_FILE"
+    echo "[INFO] $(date '+%Y-%m-%d %H:%M:%S') - Dependencies installed successfully" >> "$LOG_FILE" || echo "[ERROR] $(date '+%Y-%m-%d %H:%M:%S') - Failed to install dependencies" >> "$LOG_FILE"
 
 # Add the Microsoft GPG key and run installation/add repo; Install Microsoft Edge
 RUN echo "[INFO] $(date '+%Y-%m-%d %H:%M:%S') - Installing Microsoft Edge" >> "$LOG_FILE" && \
@@ -32,7 +32,7 @@ RUN echo "[INFO] $(date '+%Y-%m-%d %H:%M:%S') - Installing Microsoft Edge" >> "$
     echo "deb [arch=amd64] https://packages.microsoft.com/repos/edge stable main" | tee /etc/apt/sources.list.d/microsoft-edge-dev.list && \
     apt-get update && \
     apt-get -y install microsoft-edge-stable && \
-    && echo "[INFO] $(date '+%Y-%m-%d %H:%M:%S') - Microsoft Edge installed successfully" >> "$LOG_FILE" || echo "[ERROR] $(date '+%Y-%m-%d %H:%M:%S') - Failed to install Microsoft Edge" >> "$LOG_FILE"
+    echo "[INFO] $(date '+%Y-%m-%d %H:%M:%S') - Microsoft Edge installed successfully" >> "$LOG_FILE" || echo "[ERROR] $(date '+%Y-%m-%d %H:%M:%S') - Failed to install Microsoft Edge" >> "$LOG_FILE"
 
 # Download the specific version of msedgedriver
 RUN echo "[INFO] $(date '+%Y-%m-%d %H:%M:%S') - Installing Edge WebDriver" >> "$LOG_FILE" && \
@@ -40,7 +40,7 @@ RUN echo "[INFO] $(date '+%Y-%m-%d %H:%M:%S') - Installing Edge WebDriver" >> "$
     unzip /tmp/edgedriver_linux64.zip -d /usr/local/bin/ && \
     chmod +x /usr/local/bin/msedgedriver && \
     rm /tmp/edgedriver_linux64.zip && \
-    && echo "[INFO] $(date '+%Y-%m-%d %H:%M:%S') - Edge WebDriver installed successfully" >> "$LOG_FILE" || echo "[ERROR] $(date '+%Y-%m-%d %H:%M:%S') - Failed to install Edge WebDriver" >> "$LOG_FILE"
+    echo "[INFO] $(date '+%Y-%m-%d %H:%M:%S') - Edge WebDriver installed successfully" >> "$LOG_FILE" || echo "[ERROR] $(date '+%Y-%m-%d %H:%M:%S') - Failed to install Edge WebDriver" >> "$LOG_FILE"
 
 # Log before copying application files
 RUN echo "[INFO] $(date '+%Y-%m-%d %H:%M:%S') - Generating Application Files" >> "$LOG_FILE"
@@ -52,7 +52,7 @@ COPY . $APP_DIR/
 RUN echo "[INFO] $(date '+%Y-%m-%d %H:%M:%S') - Installing Python Packages" >> "$LOG_FILE" && \
     pip install -r requirements.txt && \
     pip install debugpy && \
-    && echo "[INFO] $(date '+%Y-%m-%d %H:%M:%S') - Python packages installed successfully" >> "$LOG_FILE" || echo "[ERROR] $(date '+%Y-%m-%d %H:%M:%S') - Failed to install Python packages" >> "$LOG_FILE"
+    echo "[INFO] $(date '+%Y-%m-%d %H:%M:%S') - Python packages installed successfully" >> "$LOG_FILE" || echo "[ERROR] $(date '+%Y-%m-%d %H:%M:%S') - Failed to install Python packages" >> "$LOG_FILE"
 
 # Log mapping volumes
 RUN echo "[INFO] $(date '+%Y-%m-%d %H:%M:%S') - Mapping Volumes" >> "$LOG_FILE"
