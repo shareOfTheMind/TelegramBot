@@ -25,7 +25,7 @@ RUN apt-get update && apt-get install -y \
 RUN wget -qO- https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor | tee /etc/apt/trusted.gpg.d/microsoft.gpg > /dev/null \
     && echo "deb [arch=amd64] https://packages.microsoft.com/repos/edge stable main" | tee /etc/apt/sources.list.d/microsoft-edge-dev.list \
     && apt-get update \
-    && apt-get install microsoft-edge-stable
+    && apt-get -y install microsoft-edge-stable
 
 
 # Download the specific version of msedgedriver
