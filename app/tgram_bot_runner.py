@@ -1,4 +1,3 @@
-import os
 import datetime
 import gc
 import random
@@ -54,7 +53,7 @@ async def forward_message(update: Update, context: CallbackContext):
                         return
                 
                     # next, grab the media, url, profile, and video (bool) from post obj
-                    media_obj, url, profile, is_video, like_count, view_count = get_media_from_ig_post(short_code=shortcode)
+                    media_obj, url, profile, is_video, like_count, view_count, is_carousel = get_media_from_ig_post(short_code=shortcode)
                     if not media_obj:
                         write_log(message=f"Media Not Parsed Successfully", level='warning')
                         await message.reply_text("Failed to download media from Instagram post.")
@@ -64,7 +63,10 @@ async def forward_message(update: Update, context: CallbackContext):
                     submission_message.append("Your media was parsed successfully and is processing!\n")
 
                     if is_video:
-                        caption_data = f"{url}\n❤️ {like_count:,}\n👀 {view_count:,}"
+                        if not is_carousel:
+                            caption_data = f"{url}\n❤️ {like_count:,}\n👀 {view_count:,}"
+                        else:
+                            caption_data = f"{url}\n❤️ {like_count:,}"
                         video_input = InputFile(obj=media_obj, filename=f"{profile}_{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}.mp4")
                         await context.bot.send_video(chat_id=DESTINATION_CHANNEL_ID, video=video_input, caption=caption_data, supports_streaming=True)
                     else:
