@@ -11,7 +11,7 @@ ENV CONFIG_DIR=$APP_DIR/app/config
 # Set working directory
 WORKDIR $APP_DIR
 
-# Install required packages for Microsoft Edge and msedgedriver
+# Install required packages for downloading and installing Microsoft Edge
 RUN apt-get update && apt-get install -y \
     wget \
     gnupg \
@@ -19,21 +19,20 @@ RUN apt-get update && apt-get install -y \
     unzip \
     && apt-get clean
 
-# Add Microsoft Edge GPG key and repository
-RUN wget -qO - https://packages.microsoft.com/keys/microsoft.asc | apt-key add - \
-    && echo "deb [arch=amd64] https://packages.microsoft.com/debian bullseye main" > /etc/apt/sources.list.d/microsoft-edge.list
+# Download and install Microsoft Edge
+RUN wget https://packages.microsoft.com/keys/microsoft.asc -O microsoft.asc \
+    && gpg --dearmor microsoft.asc -o /usr/share/keyrings/microsoft.gpg \
+    && echo "deb [signed-by=/usr/share/keyrings/microsoft.gpg] https://packages.microsoft.com/debian stable main" > /etc/apt/sources.list.d/microsoft-edge.list \
+    && apt-get update \
+    && apt-get install -y microsoft-edge-stable \
+    && rm microsoft.asc
 
-# Update package lists and install Microsoft Edge
-RUN apt-get update && apt-get install -y microsoft-edge-stable
+# Download the specific version of msedgedriver
+RUN wget -q https://msedgedriver.azureedge.net/130.0.2849.19/edgedriver_linux64.zip -O /tmp/edgedriver_linux64.zip \
+    && unzip /tmp/edgedriver_linux64.zip -d /usr/local/bin/ \
+    && chmod +x /usr/local/bin/edgedriver \
+    && rm /tmp/edgedriver_linux64.zip
 
-# Download the appropriate version of msedgedriver
-RUN wget -q https://msedgedriver.azureedge.net/LATEST_STABLE/LATEST -O msedgedriver_version \
-    && MSEdgeDriver_VERSION=$(cat msedgedriver_version) \
-    && wget -q https://msedgedriver.azureedge.net/$MSEdgeDriver_VERSION/msedgedriver_linux64.zip \
-    && unzip msedgedriver_linux64.zip -d /usr/local/bin/ \
-    && chmod +x /usr/local/bin/msedgedriver \
-    && rm msedgedriver_version msedgedriver_linux64.zip
-    
 # Copy application files
 COPY . $APP_DIR/
 
