@@ -2,6 +2,7 @@ import re
 
 from telegram import Message
 from .instagram_content_loader import get_instagram_post_media
+from .tiktok_content_loader import get_tiktok_post_media
 from config.tgram_bot_logger import write_log
 
 
@@ -39,6 +40,7 @@ submission_phrases = [
     ]
 
 
+
 def get_shortcode_from_message(message: Message) -> str | None:
     '''
         Regular expression to extract the shortcode from an incoming message text
@@ -70,6 +72,23 @@ def get_media_from_ig_post(short_code: str) -> (tuple[bytes, str, str, bool, int
     '''
     
     return get_instagram_post_media(shortcode=short_code)
+
+
+
+def get_media_from_tiktok_post(share_link: str) -> (tuple[bytes, str, str, bool, int, int | None] | tuple[None, None, None, None, None, None]):
+    '''
+        Calls `get_tiktok_post_media()` to extract specific metadata from an tiktok post
+
+        Returns a tuple containing
+        - The media content (bytes)
+        - The post URL (str)
+        - The profile (str)
+        - A boolean indicating whether the post is a video. In this case it will always be true (bool)
+        - The amount likes (int)
+        - The amount of views (int)
+    '''
+    
+    return get_tiktok_post_media(share_link)
 
 
 
