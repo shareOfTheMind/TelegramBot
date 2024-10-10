@@ -7,6 +7,7 @@ ENV APP_DIR=/srv/telegram_service
 ENV VENV_DIR=$APP_DIR/api_service_venv
 ENV LOG_DIR=$APP_DIR/logs
 ENV CONFIG_DIR=$APP_DIR/app/config
+ENV LOG_FILE=$LOG_DIR/docker_build_deploy.log
 
 # Set working directory
 WORKDIR $APP_DIR
@@ -15,17 +16,17 @@ WORKDIR $APP_DIR
 RUN mkdir -p $LOG_DIR
 
 # Create a function for logging
-RUN cat << 'EOF' > /usr/local/bin/log && \
-    echo "log() {" >> /usr/local/bin/log && \
-    echo "    local msg=\"\$1\";" >> /usr/local/bin/log && \
-    echo "    local timestamp=\"\$(date '+%Y-%m-%d %H:%M:%S')\";" >> /usr/local/bin/log && \
-    echo "    echo \"\$timestamp - \$msg\" >> \"\$LOG_FILE\";" >> /usr/local/bin/log && \
-    echo "}" >> /usr/local/bin/log && \
+RUN echo '#!/bin/bash' > /usr/local/bin/log && \
+    echo 'log() {' >> /usr/local/bin/log && \
+    echo '    local msg="$1";' >> /usr/local/bin/log && \
+    echo '    local timestamp="$(date +\"%Y-%m-%d %H:%M:%S\")";' >> /usr/local/bin/log && \
+    echo '    echo "$timestamp - $msg" >> "/srv/telegram_service/logs/docker_build_deploy.log";' >> /usr/local/bin/log && \
+    echo '}' >> /usr/local/bin/log && \
     chmod +x /usr/local/bin/log
 
+
 # Create deploy log file and initialize log
-RUN LOG_FILE="$LOG_DIR/docker_build_$(date '+%Y-%m-%d_%H-%M-%S').log" && \
-    touch "$LOG_FILE" && \
+RUN touch "$LOG_FILE" && \
     log "Starting the build process"
 
 # Install required packages for downloading and installing Microsoft Edge
