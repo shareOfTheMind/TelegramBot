@@ -15,12 +15,13 @@ WORKDIR $APP_DIR
 RUN mkdir -p $LOG_DIR
 
 # Create a function for logging
-RUN echo '#!/bin/bash\n\
-log() { \
-    local msg="$1"; \
-    local timestamp="$(date +\'%Y-%m-%d %H:%M:%S\')"; \
-    echo "$timestamp - $msg" >> "$LOG_FILE"; \
-}' > /usr/local/bin/log && chmod +x /usr/local/bin/log
+RUN cat << 'EOF' > /usr/local/bin/log && \
+    echo "log() {" >> /usr/local/bin/log && \
+    echo "    local msg=\"\$1\";" >> /usr/local/bin/log && \
+    echo "    local timestamp=\"\$(date '+%Y-%m-%d %H:%M:%S')\";" >> /usr/local/bin/log && \
+    echo "    echo \"\$timestamp - \$msg\" >> \"\$LOG_FILE\";" >> /usr/local/bin/log && \
+    echo "}" >> /usr/local/bin/log && \
+    chmod +x /usr/local/bin/log
 
 # Create deploy log file and initialize log
 RUN LOG_FILE="$LOG_DIR/docker_build_$(date '+%Y-%m-%d_%H-%M-%S').log" && \
