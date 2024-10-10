@@ -24,7 +24,7 @@ bot_logger = setup_logger(level=10) # debug level logging
 
 
 async def start(update: Update, context: CallbackContext):
-    await update.message.reply_text("Send me any text, video, or Instagram link, and I'll forward the media and meta-data to @mindvirusfeed. Slides ot Stories coming soon!")
+    await update.message.reply_text("Send me any text, video, TikTok link, or Instagram link, and I'll forward the media and meta-data to @mindvirusfeed. Slides and Stories coming soon!")
 
 
 async def forward_message(update: Update, context: CallbackContext):
