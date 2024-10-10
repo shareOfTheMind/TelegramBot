@@ -85,7 +85,7 @@ def generate_cookies(user='tgrambotlord', pwd='') -> bool:
             except Exception as e:
                 write_log(message=f"An error occurred while trying to dismiss the challenge ({type(e)})", level='error')
                 html_source = driver.page_source
-                with open(f'{source_page_filepath}/challenge_page_source.html', 'r') as file:
+                with open(f'{source_page_filepath}/challenge_page_source.html', 'w') as file:
                     file.write(html_source)
                 write_log(message=f"Page source saved to file for Anaylsis at '{source_page_filepath}'", level='debug')
                 return False
