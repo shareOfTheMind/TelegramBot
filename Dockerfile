@@ -12,7 +12,6 @@ ENV CONFIG_DIR=$APP_DIR/app/config
 RUN apt-get update && apt-get install -y \
     libglib2.0-0 \
     libnss3 \
-    libnssutil3 \
     libnspr4 \
     libxcb1 \
     libx11-xcb1 \
@@ -30,6 +29,7 @@ RUN apt-get update && apt-get install -y \
     libxshmfence1 \
     libgbm1 \
     libasound2
+
 
 
 # Set working directory
