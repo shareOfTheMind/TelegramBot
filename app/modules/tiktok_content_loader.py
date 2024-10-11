@@ -131,6 +131,6 @@ def parse_tiktok_data(share_link: str):
 
         return None
 
-
-if __name__ == "__main__":
-    parse_tiktok_data("https://www.tiktok.com/t/ZP88euGtW/")
+# NOTE: for debugging purposes
+# if __name__ == "__main__":
+#     parse_tiktok_data("https://www.tiktok.com/t/ZP88euGtW/")
