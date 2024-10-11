@@ -129,7 +129,7 @@ def read_cookies_from_file(path:str) -> dict:
             for line in f:
                 line = line.strip()  # Remove any surrounding whitespace or newline characters
                 if '=' in line:  # Ensure the line has the correct format
-                    name, value = line.split('=', 0)  # Split only at the first '='
+                    name, value = line.split('=', 1)  # Split only at the first '='
                     cookies[name] = value
     except FileNotFoundError:
         write_log(message=f"Cookie file '{path}' not found. Please generate cookies first.", level='error')
