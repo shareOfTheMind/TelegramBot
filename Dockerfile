@@ -6,7 +6,7 @@ ENV PYTHONUNBUFFERED 1
 ENV APP_DIR=/srv/telegram_service
 ENV VENV_DIR=$APP_DIR/api_service_venv
 ENV LOG_DIR=$APP_DIR/logs
-ENV CONFIG_DIR=$APP_DIR/app/config
+ENV CONFIG_DIR=/home/config
 ENV LOG_FILE=$LOG_DIR/docker_build_deploy.log
 
 # Set working directory
