@@ -24,7 +24,7 @@ jobs:
       - name: Add known hosts
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.TG_PROD_SERVER_HOST_KEY }}" >> ~/.ssh/known_hosts
+          echo "${{ secrets.AWS_TG_HOST_KEY }}" >> ~/.ssh/known_hosts
 
       # Log in to Docker Hub (or GitHub Container Registry, or any container registry you're using)
       - name: Log in to Docker Hub
@@ -39,7 +39,7 @@ jobs:
         run: docker push "${{ secrets.DOCKER_USERNAME }}"/telegram_bot_app:latest
 
       # SSH into VPS and pull the latest Docker image, stop old container, and start the new one
-      - name: Deploy container to VPS
+      - name: Deploy container to AWS
         run: |
           ssh deployuser@${{ secrets.TG_PROD_SERVER }} << 'EOF'
             docker pull "${{ secrets.DOCKER_USERNAME }}"/telegram_bot_app:latest
