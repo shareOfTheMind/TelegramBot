@@ -43,7 +43,7 @@ def parse_instagram_data(post_url: str) -> dict:
     #     'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36'
     # }
 
-    cookie_session = read_cookies_from_file("instagram_cookie_info.txt")
+    cookie_session = read_cookies_from_file("../config/instagram_cookies.txt")
 
     if not cookie_session:
         generate_cookies()

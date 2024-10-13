@@ -49,6 +49,7 @@ jobs:
               --name telegram_bot_container \
               -v /var/log/tgram_bot_logging:/var/log/tgram_bot_logging \
               -v /home/ubuntu/config/.env:/srv/telegram_service/app/config/.env \
+              -v /home/ubuntu/config/instagram_cookies.txt:/srv/telegram_service/app/config/instagram_cookies.txt \
               --restart unless-stopped \
               "${{ secrets.DOCKER_USERNAME }}"/telegram_bot_app:latest
           EOF
