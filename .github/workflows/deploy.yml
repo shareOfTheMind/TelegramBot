@@ -41,7 +41,7 @@ jobs:
       # SSH into VPS and pull the latest Docker image, stop old container, and start the new one
       - name: Deploy container to AWS
         run: |
-          ssh deployuser@${{ secrets.TG_PROD_SERVER }} << 'EOF'
+          ssh ubuntu@${{ secrets.TG_PROD_SERVER }} << 'EOF'
             docker pull "${{ secrets.DOCKER_USERNAME }}"/telegram_bot_app:latest
             docker stop telegram_bot_container || true
             docker rm telegram_bot_container || true
