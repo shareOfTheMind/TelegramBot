@@ -1,7 +1,10 @@
 import os
 from dotenv import load_dotenv
+
+# define config path
+config_path = os.path.join(os.path.dirname(__file__), '..', 'config')
 # Get the path to the .env file, two levels up
-dotenv_path = os.path.join(os.path.dirname(__file__), '..', 'config', '.env')
+dotenv_path = os.path.join(config_path, '.env')
 
 load_dotenv(dotenv_path)
 
