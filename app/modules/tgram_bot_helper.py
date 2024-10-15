@@ -112,6 +112,8 @@ def contains_tiktok_link(text: str) -> bool:
     '''
         Function to return whether the provided string is a tiktok share link
     '''
+    # get the URL scheme and the URI sans query parameters
+    text = text.split('?')[0]
 
     # already escaped so we dont need the "r" string specifier
     pattern = "^https:\/\/www\.tiktok\.com\/(?:@[\w.]+\/video\/\d+|t\/[\w]+)\/?$"

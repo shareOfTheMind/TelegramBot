@@ -117,7 +117,7 @@ def generate_cookies(user='tgrambotlord', pwd='') -> bool:
 
     return True
 
-def read_cookies_from_file(path:str) -> dict:
+def read_cookies_from_file(filename:str) -> dict:
     '''
         Reads cookies from a file and returns them as a dictionary. 
 
@@ -125,7 +125,7 @@ def read_cookies_from_file(path:str) -> dict:
                 'instagram_cookie_info.txt'
                 'tiktok_cookie_info.txt'
     '''
-
+    path = os.path.join(config_path, filename)
     cookies = {}
     try:
         with open(path, 'r') as f:

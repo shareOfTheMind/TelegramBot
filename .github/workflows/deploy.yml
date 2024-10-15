@@ -24,7 +24,7 @@ jobs:
       - name: Add known hosts
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.TG_PROD_SERVER_HOST_KEY }}" >> ~/.ssh/known_hosts
+          echo "${{ secrets.AWS_TG_HOST_KEY }}" >> ~/.ssh/known_hosts
 
       # Log in to Docker Hub (or GitHub Container Registry, or any container registry you're using)
       - name: Log in to Docker Hub
@@ -39,17 +39,17 @@ jobs:
         run: docker push "${{ secrets.DOCKER_USERNAME }}"/telegram_bot_app:latest
 
       # SSH into VPS and pull the latest Docker image, stop old container, and start the new one
-      - name: Deploy container to VPS
+      - name: Deploy container to AWS
         run: |
-          ssh deployuser@${{ secrets.TG_PROD_SERVER }} << 'EOF'
+          ssh ubuntu@${{ secrets.AWS_TG_SERVER }} << 'EOF'
             docker pull "${{ secrets.DOCKER_USERNAME }}"/telegram_bot_app:latest
             docker stop telegram_bot_container || true
             docker rm telegram_bot_container || true
             docker run -d \
               --name telegram_bot_container \
               -v /var/log/tgram_bot_logging:/var/log/tgram_bot_logging \
-              -v /srv/telegram_service/app/config/.env:/srv/telegram_service/app/config/.env \
-              -v /srv/telegram_service/cookie_info.txt:/srv/telegram_service/cookie_info.txt \
+              -v /home/ubuntu/config/.env:/srv/telegram_service/app/config/.env \
+              -v /home/ubuntu/config/instagram_cookies.txt:/srv/telegram_service/app/config/instagram_cookies.txt \
               --restart unless-stopped \
               "${{ secrets.DOCKER_USERNAME }}"/telegram_bot_app:latest
           EOF
