@@ -103,7 +103,7 @@ def generate_cookies(user='tgrambotlord', pwd='') -> bool:
             # raise SystemExit("Required cookies not found. Please check your login process.")
         
         # Write cookies to a file
-        with open('../config/instagram_cookies.txt', 'w') as f:
+        with open(f'{config_path}/instagram_cookies.txt', 'w') as f:
             for name, value in necessary_cookies.items():
                 f.write(f"{name}={value}\n")
        
