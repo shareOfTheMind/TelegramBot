@@ -1,6 +1,8 @@
+import os
 import requests
+import json
 from config.tgram_bot_logger import write_log
-from .generate_cookies import generate_cookies, read_cookies_from_file
+from .generate_cookies import generate_cookies, get_session_cookies
 
 retry_count = 0
 
@@ -39,14 +41,14 @@ def get_instagram_post_media(shortcode: str) -> tuple[bytes, str, str, bool, int
 def parse_instagram_data(post_url: str) -> dict:
     json_url = post_url + '?__a=1&__d=dis'
 
-    # headers = {
-    #     'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36'
-    # }
-    
-    cookie_session = read_cookies_from_file(filename="instagram_cookies.txt")
+    cookie_session = os.getenv('IG_SESSION_COOKIES')
 
+    # if a cookie session does not exist within the environment, create it
     if not cookie_session:
         generate_cookies()
+        cookie_session = json.loads(get_session_cookies(ig=True))
+    else:
+        cookie_session = json.loads(cookie_session)
 
     # Update session with the retrieved cookies
     session.cookies.update(cookie_session)
@@ -57,9 +59,11 @@ def parse_instagram_data(post_url: str) -> dict:
     # Check if response failed and retry with new cookies
     if response.status_code >= 400:
         write_log(message=f"Response failed with status code {response.status_code}. Generating new cookies.", level='warning')
-        cookie_session = generate_cookies()
+        generate_cookies()
+        cookie_session = json.loads(get_session_cookies(ig=True))
         session.cookies.update(cookie_session)
         response = session.get(json_url)
+        response.raise_for_status()
 
     # Check if the request was successful
     if response.status_code != 200:
@@ -126,14 +130,17 @@ def parse_instagram_data(post_url: str) -> dict:
     except KeyError as e:
         write_log(message=f"KeyError accessing JSON data: {e}", level='error')
         return None
-    except Exception as ex:
+    except requests.HTTPError as http_err:
         global retry_count
-        write_log(message=f"An unexpected error occurred in 'parse_instagram_data()':\n\t--->{type(ex)}\n\t---> {ex}\n\t---> Request Status Code: {response.status_code if response else 'Unknown'}", level='error')
 
         if 'challenge' in response.url and retry_count < 3:
             write_log(message=f"Detected Instagram challenge. Generating new cookies. Retry Count {retry_count+1}", level='warning')
             retry_count += 1
             generate_cookies()
             return parse_instagram_data(post_url=post_url)  # Retry
-
+        
+        write_log(message=f"Instagram request to {post_url} failed with status {http_err.response.status_code}", level='warning')
+        return None
+    except Exception as ex:
+        write_log(message=f"An unexpected error occurred in 'parse_instagram_data()':\n\t--->{type(ex)}\n\t---> {ex}\n\t---> Request Status Code: {response.status_code if response else 'Unknown'}", level='error')
         return None

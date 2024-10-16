@@ -3,7 +3,7 @@ import os
 import json
 from bs4 import BeautifulSoup
 from config.tgram_bot_logger import write_log
-from .generate_cookies import read_cookies_from_file
+from .generate_cookies import get_session_cookies
 
 retry_count = 0
 
@@ -59,7 +59,7 @@ def parse_tiktok_data(share_link: str):
 
     # we dont need to login for tiktok. Here we attempt to reuse any saved session data
     # as to not get detected as a bot due to constant cookie refreshing
-    cookie_session = read_cookies_from_file("tiktok_cookie_info.txt")
+    cookie_session = json.loads(get_session_cookies(tiktok=True))
     if cookie_session:
         session.cookies.update(cookie_session)
 
@@ -67,9 +67,8 @@ def parse_tiktok_data(share_link: str):
 
     # update the session data with any new cookies
     if cookie_session != session.cookies:
-        with open("tiktok_cookie_info.txt", "w") as f:
-            for name, value in session.cookies.items():
-                f.write(f"{name}={value}\n")
+        os.environ['TIKTOK_SESSION_COOKIES'] = json.dumps(session.cookies)
+
 
     if share_link_response.status_code != 200:
         write_log(
@@ -124,8 +123,7 @@ def parse_tiktok_data(share_link: str):
                 message=f"Refreshing session. Retry Count {retry_count}",
                 level="warning",
             )
-            if os.path.exists("tiktok_cookie_info.txt"):
-                os.remove("tiktok_cookie_info.txt")
+            os.environ['TIKTOK_SESSION_COOKIES'] = {}
 
             return parse_tiktok_data(share_link)  # Retry
 

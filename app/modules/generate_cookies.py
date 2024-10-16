@@ -1,5 +1,6 @@
 import time
 import os
+import json
 
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -100,14 +101,12 @@ def generate_cookies(user='tgrambotlord', pwd='') -> bool:
 
         if 'csrftoken' not in necessary_cookies or 'sessionid' not in necessary_cookies:
             write_log(message="Required cookies not found. Please check your login process.", level='error')
-            # raise SystemExit("Required cookies not found. Please check your login process.")
+
         
         # Write cookies to a file
-        with open(f'{config_path}/instagram_cookies.txt', 'w') as f:
-            for name, value in necessary_cookies.items():
-                f.write(f"{name}={value}\n")
+        os.environ['IG_SESSION_COOKIES'] = json.dumps(necessary_cookies)
        
-        write_log(message="Successfully imported cookies from Edge and saved to file.", level='info')
+        write_log(message="Successfully imported cookies from Edge and saved to environment.", level='info')
 
     except Exception as ex:
         write_log(message=f"Unkown Script error occured in Session Generation\n{ex}", level='error')
@@ -117,24 +116,15 @@ def generate_cookies(user='tgrambotlord', pwd='') -> bool:
 
     return True
 
-def read_cookies_from_file(filename:str) -> dict:
-    '''
-        Reads cookies from a file and returns them as a dictionary. 
 
-        path: the path to the cookie info file. currently should only be: 
-                'instagram_cookie_info.txt'
-                'tiktok_cookie_info.txt'
-    '''
-    path = os.path.join(config_path, filename)
-    cookies = {}
-    try:
-        with open(path, 'r') as f:
-            for line in f:
-                line = line.strip()  # Remove any surrounding whitespace or newline characters
-                if '=' in line:  # Ensure the line has the correct format
-                    name, value = line.split('=', 1)  # Split only at the first '='
-                    cookies[name] = value
-    except FileNotFoundError:
-        write_log(message=f"Cookie file '{path}' not found. Please generate cookies first.", level='error')
 
-    return cookies
+def get_session_cookies(ig=False, tiktok=False):
+    '''
+        ### Returns the json string value of the stored environment variable of the necessary cookie session
+
+        Note: The tiktok paramter is mostly for readability, so when called you can see exactly what type of cookies are being grabbed
+    '''
+
+    platform = 'IG' if ig else 'TIKTOK'
+
+    return os.getenv(f"{platform}_SESSION_COOKIES", {})
