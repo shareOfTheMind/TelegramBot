@@ -11,7 +11,7 @@ from selenium.webdriver.common.keys import Keys
 
 from dotenv import load_dotenv
 from config.tgram_bot_logger import write_log
-from . import IG_PASS, config_path
+from . import IG_PASS, dotenv_path
 
 
 # Path to Edge WebDriver executable
@@ -131,7 +131,7 @@ def get_session_cookies(ig=False, tiktok=False) -> str:
 
 
 
-def update_env_variable(key: str, value: str, env_file_path=config_path):
+def update_env_variable(key: str, value: str, env_file_path=dotenv_path):
     try:
         with open(env_file_path, 'r') as f:
             lines = f.readlines()
@@ -148,7 +148,7 @@ def update_env_variable(key: str, value: str, env_file_path=config_path):
             if not updated:
                 f.write(f"{key}={value}\n")
 
-        load_dotenv(config_path) # update the environment variables in mem
+        load_dotenv(env_file_path) # update the environment variables in mem
         write_log(message=f"Updated {key} in {env_file_path}", level='info')
     except FileNotFoundError:
         write_log(message=f"{env_file_path} not found. Creating a new .env file.", level='warning')
