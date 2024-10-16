@@ -3,7 +3,7 @@ import os
 import json
 from bs4 import BeautifulSoup
 from config.tgram_bot_logger import write_log
-from .generate_cookies import get_session_cookies
+from .generate_cookies import get_session_cookies, update_env_variable
 
 retry_count = 0
 
@@ -67,7 +67,7 @@ def parse_tiktok_data(share_link: str):
 
     # update the session data with any new cookies
     if cookie_session != session.cookies:
-        os.environ['TIKTOK_SESSION_COOKIES'] = json.dumps(session.cookies.get_dict())
+        update_env_variable(key='TIKTOK_SESSION_COOKIES', value=json.dumps(session.cookies.get_dict()))
 
 
     if share_link_response.status_code != 200:
@@ -123,7 +123,7 @@ def parse_tiktok_data(share_link: str):
                 message=f"Refreshing session. Retry Count {retry_count}",
                 level="warning",
             )
-            os.environ['TIKTOK_SESSION_COOKIES'] = {}
+            update_env_variable(key='TIKTOK_SESSION_COOKIES', value="{}")
 
             return parse_tiktok_data(share_link)  # Retry
 
