@@ -131,7 +131,7 @@ def get_session_cookies(ig=False, tiktok=False) -> str:
 
 
 
-def update_env_variable(key: str, value: str, env_file_path=config_path):
+def update_env_variable(key: str, value: str, env_file_path=f"{config_path}/.env"):
     try:
         with open(env_file_path, 'r') as f:
             lines = f.readlines()
