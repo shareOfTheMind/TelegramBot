@@ -67,7 +67,7 @@ def parse_tiktok_data(share_link: str):
 
     # update the session data with any new cookies
     if cookie_session != session.cookies:
-        os.environ['TIKTOK_SESSION_COOKIES'] = json.dumps(session.cookies)
+        os.environ['TIKTOK_SESSION_COOKIES'] = json.dumps(session.cookies.get_dict())
 
 
     if share_link_response.status_code != 200:
