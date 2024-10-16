@@ -118,7 +118,7 @@ def generate_cookies(user='tgrambotlord', pwd='') -> bool:
 
 
 
-def get_session_cookies(ig=False, tiktok=False):
+def get_session_cookies(ig=False, tiktok=False) -> str:
     '''
         ### Returns the json string value of the stored environment variable of the necessary cookie session
 
@@ -127,4 +127,4 @@ def get_session_cookies(ig=False, tiktok=False):
 
     platform = 'IG' if ig else 'TIKTOK'
 
-    return os.getenv(f"{platform}_SESSION_COOKIES", {})
+    return os.getenv(f"{platform}_SESSION_COOKIES", "{}")
