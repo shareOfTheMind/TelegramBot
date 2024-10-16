@@ -63,7 +63,6 @@ def parse_instagram_data(post_url: str) -> dict:
         cookie_session = json.loads(get_session_cookies(ig=True))
         session.cookies.update(cookie_session)
         response = session.get(json_url)
-        response.raise_for_status()
 
     # Check if the request was successful
     if response.status_code != 200:
@@ -130,8 +129,10 @@ def parse_instagram_data(post_url: str) -> dict:
     except KeyError as e:
         write_log(message=f"KeyError accessing JSON data: {e}", level='error')
         return None
-    except requests.HTTPError as http_err:
+    except Exception as ex:
         global retry_count
+        write_log(message=f"An unexpected error occurred in 'parse_instagram_data()':\n\t--->{type(ex)}\n\t---> {ex}\n\t---> Request Status Code: {response.status_code if response else 'Unknown'}", level='error')
+
 
         if 'challenge' in response.url and retry_count < 3:
             write_log(message=f"Detected Instagram challenge. Generating new cookies. Retry Count {retry_count+1}", level='warning')
@@ -139,8 +140,4 @@ def parse_instagram_data(post_url: str) -> dict:
             generate_cookies()
             return parse_instagram_data(post_url=post_url)  # Retry
         
-        write_log(message=f"Instagram request to {post_url} failed with status {http_err.response.status_code}", level='warning')
-        return None
-    except Exception as ex:
-        write_log(message=f"An unexpected error occurred in 'parse_instagram_data()':\n\t--->{type(ex)}\n\t---> {ex}\n\t---> Request Status Code: {response.status_code if response else 'Unknown'}", level='error')
         return None

@@ -104,8 +104,7 @@ def generate_cookies(user='tgrambotlord', pwd='') -> bool:
 
         
         # Write cookies to a file
-        os.environ['IG_SESSION_COOKIES'] = json.dumps(necessary_cookies)
-       
+        update_env_variable(key='IG_SESSION_COOKIES', value=json.dumps(necessary_cookies))       
         write_log(message="Successfully imported cookies from Edge and saved to environment.", level='info')
 
     except Exception as ex:
@@ -128,3 +127,30 @@ def get_session_cookies(ig=False, tiktok=False) -> str:
     platform = 'IG' if ig else 'TIKTOK'
 
     return os.getenv(f"{platform}_SESSION_COOKIES", "{}")
+
+
+
+def update_env_variable(key: str, value: str, env_file_path=config_path):
+    try:
+        with open(env_file_path, 'r') as f:
+            lines = f.readlines()
+
+        updated = False
+        with open(env_file_path, 'w') as f:
+            for line in lines:
+                if line.startswith(f"{key}="):
+                    f.write(f"{key}={value}\n")
+                    updated = True
+                else:
+                    f.write(line)
+
+            if not updated:
+                f.write(f"{key}={value}\n")
+
+        print(f"Updated {key} to {value} in {env_file_path}")
+    except FileNotFoundError:
+        write_log(message=f"{env_file_path} not found. Creating a new .env file.", level='warning')
+        with open(env_file_path, 'w') as f:
+            f.write(f"{key}={value}\n")
+        write_log(message=f"Created and added {key} to {env_file_path}", level='info')
+
