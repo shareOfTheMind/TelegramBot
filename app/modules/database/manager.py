@@ -13,6 +13,7 @@ from sqlalchemy.orm import sessionmaker, scoped_session
 
 class SingletonDBManager(type):
     _instances = {}
+_thread = threading.Lock()
 
     def __call__(cls, *args, **kwargs):
         if cls not in cls._instances:
