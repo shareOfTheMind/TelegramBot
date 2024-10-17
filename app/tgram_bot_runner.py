@@ -53,7 +53,7 @@ async def forward_message(update: Update, context: CallbackContext):
                         return
                 
                     # next, grab the media, url, profile, and video (bool) from post obj
-                    media_obj, url, profile, is_video, like_count, view_count, is_carousel = get_media_from_ig_post(short_code=shortcode)
+                    media_obj, url, profile, is_video, like_count, view_count, is_carousel, file_type = get_media_from_ig_post(short_code=shortcode)
                     if not media_obj:
                         write_log(message=f"Media Not Parsed Successfully", level='warning')
                         await message.reply_text("Failed to download media from Instagram post.")
@@ -63,8 +63,8 @@ async def forward_message(update: Update, context: CallbackContext):
                     submission_message.append("Your media was parsed successfully and is processing!\n")
 
                     # Create post object to upload to the DB
-                    #Post(poster=profile, likes=like_count, views=view_count, source="instagram", share_link=url, file_type=file_type, submitter=submitter)
-                    #await push_to_db(post, submitter, media_obj) 
+                    Post(poster=profile, likes=like_count, views=view_count, source="instagram", share_link=url, file_type=file_type, submitter=submitter)
+                    await push_to_db(post, submitter, media_obj) 
 
                     if is_video:
                         if not is_carousel:
