@@ -46,7 +46,7 @@ async def get_or_create_user(username: str) -> User:
     """
     write_log(message=f'Checking for user with username: {username}...', level='info')
     
-    async with db_manager() as session:
+    async with db_manager as session:
         # Attempt to retrieve the user
         user: Optional[User] = await session.query(User).filter(User.username == username).first()
         
@@ -100,7 +100,7 @@ async def get_user_by_username(username: str) -> User:
     write_log(message=f'Retrieving user with username: {username}...', level='info')
     
     # Use the global db_manager to manage the session
-    async with db_manager() as session:
+    async with db_manager as session:
         user = await session.query(User).filter(User.username == username).first()  # Retrieve user by username
         
         if user:
