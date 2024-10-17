@@ -63,7 +63,7 @@ async def forward_message(update: Update, context: CallbackContext):
                     submission_message.append("Your media was parsed successfully and is processing!\n")
 
                     # Create post object to upload to the DB
-                    Post(poster=profile, likes=like_count, views=view_count, source="instagram", share_link=url, file_type=file_type, submitter=submitter)
+                    post = Post(poster=profile, likes=like_count, views=view_count, source="instagram", share_link=url, file_type=file_type, submitter=submitter)
                     await push_to_db(post, submitter, media_obj) 
 
                     if is_video:
