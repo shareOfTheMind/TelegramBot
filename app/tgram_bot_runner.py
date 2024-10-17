@@ -104,7 +104,7 @@ async def forward_message(update: Update, context: CallbackContext):
                     media_obj = None
                     gc.collect()
 
-                # if the message does not contain an instagram link
+                # if the message does not contain an instagram/tiktok link
                 else:
                     await message.forward(chat_id=DESTINATION_CHANNEL_ID)
 
@@ -114,7 +114,7 @@ async def forward_message(update: Update, context: CallbackContext):
                 video_media = message.video
 
                 # Create post object to upload to the DB
-                post = Post(poster=message.chat.username, likes=0, views=0, source="direct", share_link=video_media.file_id, file_type=None, submitter=submitter)
+                post = Post(poster=message.chat.username, likes=0, views=0, source="direct", share_link=video_media.file_id, file_type=video_media.mime_type, submitter=submitter)
                 await push_to_db(post, submitter, None)
 
                 await context.bot.send_video(chat_id=DESTINATION_CHANNEL_ID, video=video_media, caption=f"{update.effective_user.name or 'Custom User'}'s Video")
@@ -124,7 +124,7 @@ async def forward_message(update: Update, context: CallbackContext):
                 photo_media = message.photo[-1]
 
                 # Create post object to upload to the DB
-                post = Post(poster=message.chat.username, likes=0, views=0, source="direct", share_link=photo_media.file_id, file_type=None, submitter=submitter)
+                post = Post(poster=message.chat.username, likes=0, views=0, source="direct", share_link=photo_media.file_id, file_type='jpeg', submitter=submitter)
                 await push_to_db(post, submitter, None)
 
                 await context.bot.send_photo(chat_id=DESTINATION_CHANNEL_ID, photo=photo_media, caption=f"{update.effective_user.name or 'Custom User'}'s Photo")
