@@ -8,7 +8,7 @@ class Base(DeclarativeBase):
 class User(Base):
     __tablename__ = "user"
 
-    id: Mapped[int] = mapped_column(primary_key=True)
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     username: Mapped[str] = mapped_column(String(32), unique=True)
 
     posts: Mapped[List["Post"]] = relationship(back_populates="submitter")
@@ -20,7 +20,7 @@ class User(Base):
 class Post(Base):
     __tablename__ = "post"
 
-    id: Mapped[int] = mapped_column(primary_key=True)
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     poster: Mapped[str] = mapped_column(String(32))
     likes: Mapped[int]
     views: Mapped[int]
