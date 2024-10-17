@@ -4,6 +4,8 @@
 
 import io
 
+from sqlalchemy.future import select
+from sqlalchemy.ext.asyncio import AsyncResult
 from typing import Optional
 from config.tgram_bot_logger import write_log
 from modules.database.metadata import Post, User
@@ -39,7 +41,7 @@ async def get_or_create_user(username: str) -> User:
 
     Args:
         username (str): The username of the user.
-        **kwargs: Additional attributes for creating a new user.
+        - NOT IMPLEMENTED **kwargs: Additional attributes for creating a new user.
 
     Returns:
         User: The retrieved or newly created User object.
@@ -48,7 +50,8 @@ async def get_or_create_user(username: str) -> User:
     
     async with db_manager as session:
         # Attempt to retrieve the user
-        user: Optional[User] = await session.query(User).filter(User.username == username).first()
+        result: AsyncResult = await session.execute(select(User).filter(User.username == username))
+        user: Optional[User] = result.scalars().first()
         
         if user:
             write_log(message="User found, retrieving user.", level="info")
@@ -83,7 +86,10 @@ async def user_exists(username: str) -> bool:
             bool: True if the user exists, False otherwise.
     """
     async with db_manager as session:
-        return session.query(User).filter(User.username == username).first() is not None
+        result: AsyncResult = await session.execute(select(User).filter(User.username == username))
+        user: Optional[User] = result.scalars().first()
+
+        return user is not None  # Return True if user exists, False otherwise
     
 
 
@@ -101,7 +107,8 @@ async def get_user_by_username(username: str) -> User:
     
     # Use the global db_manager to manage the session
     async with db_manager as session:
-        user = await session.query(User).filter(User.username == username).first()  # Retrieve user by username
+        result: AsyncResult = await session.execute(select(User).filter(User.username == username))
+        user: Optional[User] = result.scalars().first()
         
         if user:
             write_log(message="User successfully retrieved from the database", level="info")
