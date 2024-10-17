@@ -13,12 +13,12 @@ from sqlalchemy.orm import sessionmaker, scoped_session
 
 class SingletonDBManager(type):
     _instances = {}
-_thread = threading.Lock()
+    _thread = threading.Lock()
 
     def __call__(cls, *args, **kwargs):
         with cls._lock(): # lock to ensure thread safety
-                if cls not in cls._instances:
-                    cls._instances[cls] = super().__call__(*args, **kwargs)
+            if cls not in cls._instances:
+                cls._instances[cls] = super().__call__(*args, **kwargs)
         return cls._instances[cls]
 
 
