@@ -169,6 +169,7 @@ async def forward_message(update: Update, context: CallbackContext):
 
 
 async def push_to_db(post: Post, submitter: User, media_obj):
+    write_log(message='Writing submission to database...', level='info')
     async with db_manager as session:
         session.add(submitter)
         session.add(post)
@@ -179,9 +180,9 @@ async def push_to_db(post: Post, submitter: User, media_obj):
                 s3.upload_fileobj(media_obj, "mindshare-posts-binaries", post.source+"/"+str(post.id)+"."+post.file_type)
             session.commit()
             write_log(message="Post successfully written to the database", level="debug")
-        except:
+        except Exception as ex:
             session.rollback()
-            write_log(message="Error writing post to the database", level="error")
+            write_log(message=f"Error writing post to the database: {str(ex)}", level="error")
 
 
 
