@@ -105,6 +105,7 @@ def parse_tiktok_data(share_link: str):
 
         # retrieve the actual content binary
         content_response = session.get(content_link)
+        content_response.raise_for_status()
         content = content_response.content
         file_type = content_response.headers["Content-Type"].split("/")[1]
 
