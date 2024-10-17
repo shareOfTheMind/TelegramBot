@@ -13,7 +13,7 @@ from sqlalchemy.orm import sessionmaker, scoped_session
 
 class SingletonDBManager(type):
     _instances = {}
-    _thread = threading.Lock()
+    _lock = threading.Lock()
 
     def __call__(cls, *args, **kwargs):
         with cls._lock(): # lock to ensure thread safety
