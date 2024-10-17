@@ -2,6 +2,7 @@ import datetime
 import gc
 import random
 import traceback
+import io
 
 import boto3
 
@@ -168,7 +169,7 @@ async def forward_message(update: Update, context: CallbackContext):
 
 
 
-async def push_to_db(post: Post, submitter: User, media_obj):
+async def push_to_db(post: Post, submitter: User, media_obj: bytes):
     write_log(message='Writing submission to database...', level='info')
     async with db_manager as session:
         session.add(submitter)
@@ -177,7 +178,9 @@ async def push_to_db(post: Post, submitter: User, media_obj):
         try:
             # Upload the media_obj to s3
             if media_obj:
-                s3.upload_fileobj(media_obj, "mindshare-posts-binaries", post.source+"/"+str(post.id)+"."+post.file_type)
+                # wrap medi_obj in a BytesIO object
+                file_obj = io.BytesIO(media_obj)
+                s3.upload_fileobj(file_obj, "mindshare-posts-binaries", post.source+"/"+str(post.id)+"."+post.file_type)
             session.commit()
             write_log(message="Post successfully written to the database", level="debug")
         except Exception as ex:
