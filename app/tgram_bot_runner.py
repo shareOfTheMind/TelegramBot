@@ -162,7 +162,7 @@ async def forward_message(update: Update, context: CallbackContext):
             traceback_details.append(f"Offending Line of Exception: {frame.line}")
             traceback_details.append(f"".ljust(50,'-') + '\n')
 
-        write_log(message=f"Error traceback\n\n{'\n'.join(traceback_details)}\n\n", level='debug')
+        write_log(message=f"Error traceback\n\n{chr(10).join(traceback_details)}\n\n", level='debug')
 
         await message.reply_text("Sorry, there was an error forwarding your submission.")
 
@@ -176,7 +176,7 @@ async def push_to_db(post: Post, submitter: User, media_obj):
         try:
             # Upload the media_obj to s3
             if media_obj:
-                s3.upload_fileobj(media_obj, "mindshare-posts-binaries", str(post.id)+post.file_type)
+                s3.upload_fileobj(media_obj, "mindshare-posts-binaries", post.source+"/"+str(post.id)+"."+post.file_type)
             session.commit()
             write_log(message="Post successfully written to the database", level="debug")
         except:
