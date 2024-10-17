@@ -182,10 +182,10 @@ async def push_to_db(post: Post, submitter: User, media_obj: bytes):
                 # wrap medi_obj in a BytesIO object
                 file_obj = io.BytesIO(media_obj)
                 s3.upload_fileobj(file_obj, "mindshare-posts-binaries", post.source+"/"+str(post.id)+"."+post.file_type)
-            session.commit()
+            await session.commit()
             write_log(message="Post successfully written to the database", level="info")
         except Exception as ex:
-            session.rollback()
+            await session.rollback()
             write_log(message=f"Error writing post to the database: {str(ex)}", level="error")
 
 
