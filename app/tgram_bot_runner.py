@@ -186,6 +186,7 @@ async def push_to_db(post: Post, submitter: User, media_obj):
 
 
 
+
 def main():
     write_log(message=f"------------------- Starting BOT...", level='info')
     application = Application.builder().token(TOKEN).build()
