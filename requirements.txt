@@ -22,7 +22,6 @@ nodeenv==1.9.1
 outcome==1.3.0.post0
 platformdirs==4.2.2
 pre-commit==3.7.1
-psycopg2==2.9.9
 psycopg2-binary==2.9.9
 pycparser==2.22
 PySocks==1.7.1
