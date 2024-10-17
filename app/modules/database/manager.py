@@ -19,7 +19,6 @@ _thread = threading.Lock()
         with cls._lock(): # lock to ensure thread safety
                 if cls not in cls._instances:
                     cls._instances[cls] = super().__call__(*args, **kwargs)
-            cls._instances[cls] = super().__call__(*args, **kwargs)
         return cls._instances[cls]
 
 
