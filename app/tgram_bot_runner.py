@@ -2,9 +2,6 @@ import datetime
 import gc
 import random
 import traceback
-import io
-
-import boto3
 
 from telegram import Update, InputFile
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, CallbackContext
@@ -12,14 +9,11 @@ from telegram.ext import Application, CommandHandler, MessageHandler, filters, C
 from modules.tgram_bot_helper import *
 from config.tgram_bot_logger import setup_logger, write_log, remove_old_logs
 from modules import DESTINATION_CHANNEL_ID, TOKEN
-from modules.database.metadata import Post, User
-from modules.database.manager import db_manager
+from modules.database.metadata import Post
+from modules.database.db_transactions import push_to_db, get_or_create_user
 
 # setup logging
 bot_logger = setup_logger(level=10) # debug level logging
-
-# setup s3 client 
-s3 = boto3.client('s3')
 
 async def start(update: Update, context: CallbackContext):
     await update.message.reply_text("Send me any text, video, TikTok link, or Instagram link, and I'll forward the media and meta-data to @mindvirusfeed. Slides and Stories coming soon!")
@@ -28,7 +22,7 @@ async def start(update: Update, context: CallbackContext):
 async def forward_message(update: Update, context: CallbackContext):
     write_log(level='info', message=f"forward_message called with update: {update}")
 
-    submitter = User(username=update.message.chat.username)
+    submitter = await get_or_create_user(username=update.message.chat.username)
 
     submission_message = []
 
@@ -166,27 +160,6 @@ async def forward_message(update: Update, context: CallbackContext):
         write_log(message=f"Error traceback\n\n{chr(10).join(traceback_details)}\n\n", level='debug')
 
         await message.reply_text("Sorry, there was an error forwarding your submission.")
-
-
-
-async def push_to_db(post: Post, submitter: User, media_obj: bytes):
-    write_log(message='Writing submission to database...', level='info')
-    async with db_manager as session:
-        session.add(submitter)
-        session.add(post)
-        await session.flush()
-
-        try:
-            # Upload the media_obj to s3
-            if media_obj:
-                # wrap medi_obj in a BytesIO object
-                file_obj = io.BytesIO(media_obj)
-                s3.upload_fileobj(file_obj, "mindshare-posts-binaries", post.source+"/"+str(post.id)+"."+post.file_type)
-            await session.commit()
-            write_log(message="Post successfully written to the database", level="info")
-        except Exception as ex:
-            await session.rollback()
-            write_log(message=f"Error writing post to the database: {str(ex)}", level="error")
 
 
 
