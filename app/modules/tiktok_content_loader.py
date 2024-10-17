@@ -42,6 +42,7 @@ def get_tiktok_post_media(share_link: str) -> tuple[bytes, str, str, bool, int, 
             True,
             media_data["likes"],
             media_data["views"],
+            media_data["file_type"],
         )
     except Exception as e:
         write_log(
@@ -52,7 +53,7 @@ def get_tiktok_post_media(share_link: str) -> tuple[bytes, str, str, bool, int, 
             message=f"An Exception occurred when calling 'get_tiktok_post_media()'\n ---> Post URL: {share_link}",
             level="debug",
         )
-        return None, None, None, None, None, None
+        return None, None, None, None, None, None, None
 
 
 def parse_tiktok_data(share_link: str):
@@ -104,9 +105,11 @@ def parse_tiktok_data(share_link: str):
 
         # retrieve the actual content binary
         content_response = session.get(content_link)
+        content_response.raise_for_status()
         content = content_response.content
+        file_type = content_response.headers["Content-Type"].split("/")[1]
 
-        return {"content": content, "owner": owner, "likes": likes, "views": views}
+        return {"content": content, "owner": owner, "likes": likes, "views": views, "file_type": file_type}
     except KeyError as e:
         write_log(message=f"KeyError accessing JSON data: {e}", level="error")
         return None

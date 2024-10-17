@@ -3,24 +3,22 @@ import gc
 import random
 import traceback
 
+import boto3
+
 from telegram import Update, InputFile
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, CallbackContext
 
 from modules.tgram_bot_helper import *
 from config.tgram_bot_logger import setup_logger, write_log, remove_old_logs
 from modules import DESTINATION_CHANNEL_ID, TOKEN
+from modules.database.metadata import Post, User
+from modules.database.manager import db_manager
 
 # setup logging
 bot_logger = setup_logger(level=10) # debug level logging
 
-
-
-
-
-
-
-
-
+# setup s3 client 
+s3 = boto3.client('s3')
 
 async def start(update: Update, context: CallbackContext):
     await update.message.reply_text("Send me any text, video, TikTok link, or Instagram link, and I'll forward the media and meta-data to @mindvirusfeed. Slides and Stories coming soon!")
@@ -28,6 +26,8 @@ async def start(update: Update, context: CallbackContext):
 
 async def forward_message(update: Update, context: CallbackContext):
     write_log(level='info', message=f"forward_message called with update: {update}")
+
+    submitter = User(username=update.message.chat.username)
 
     submission_message = []
 
@@ -53,7 +53,7 @@ async def forward_message(update: Update, context: CallbackContext):
                         return
                 
                     # next, grab the media, url, profile, and video (bool) from post obj
-                    media_obj, url, profile, is_video, like_count, view_count, is_carousel = get_media_from_ig_post(short_code=shortcode)
+                    media_obj, url, profile, is_video, like_count, view_count, is_carousel, file_type = get_media_from_ig_post(short_code=shortcode)
                     if not media_obj:
                         write_log(message=f"Media Not Parsed Successfully", level='warning')
                         await message.reply_text("Failed to download media from Instagram post.")
@@ -61,6 +61,10 @@ async def forward_message(update: Update, context: CallbackContext):
                     
                     write_log(message=f"Media Was Parsed Successfully From Instagram URL", level='info')
                     submission_message.append("Your media was parsed successfully and is processing!\n")
+
+                    # Create post object to upload to the DB
+                    Post(poster=profile, likes=like_count, views=view_count, source="instagram", share_link=url, file_type=file_type, submitter=submitter)
+                    await push_to_db(post, submitter, media_obj) 
 
                     if is_video:
                         if not is_carousel:
@@ -83,7 +87,7 @@ async def forward_message(update: Update, context: CallbackContext):
                 elif contains_tiktok_link(msg_text):
                     write_log(message=f"TikTok Link URL Found Within Message Text", level='info')
 
-                    media_obj, url, profile, is_video, like_count, view_count = get_media_from_tiktok_post(msg_text)
+                    media_obj, url, profile, is_video, like_count, view_count, file_type = get_media_from_tiktok_post(msg_text)
                     if not media_obj:
                         write_log(message=f"Media Not Parsed Successfully", level='warning')
                         await message.reply_text("Failed to download media from TikTok post.")
@@ -91,6 +95,10 @@ async def forward_message(update: Update, context: CallbackContext):
                     
                     write_log(message=f"Media Was Parsed Successfully From TikTok URL", level='info')
                     submission_message.append("Your media was parsed successfully and is processing!\n")
+
+                    # Create post object to upload to the DB
+                    post = Post(poster=profile, likes=like_count, views=view_count, source="tiktok", share_link=url, file_type=file_type, submitter=submitter)
+                    await push_to_db(post, submitter, media_obj)                    
 
                     caption_data = f"{url}\n❤️ {like_count:,}\n👀 {view_count:,}"
                     video_input = InputFile(obj=media_obj, filename=f"{profile}_{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}.mp4")
@@ -110,11 +118,19 @@ async def forward_message(update: Update, context: CallbackContext):
                 write_log(message="Video Message Recieved", level='info')
                 video_media = message.video
 
+                # Create post object to upload to the DB
+                post = Post(poster=message.chat.username, likes=0, views=0, source="direct", share_link=video_media.file_id, file_type=None, submitter=submitter)
+                await push_to_db(post, submitter, None)
+
                 await context.bot.send_video(chat_id=DESTINATION_CHANNEL_ID, video=video_media, caption=f"{update.effective_user.name or 'Custom User'}'s Video")
             # else if the message was photo media
             elif message.photo:
                 write_log(message="Photo Message Recieved", level='info')
                 photo_media = message.photo[-1]
+
+                # Create post object to upload to the DB
+                post = Post(poster=message.chat.username, likes=0, views=0, source="direct", share_link=photo_media.file_id, file_type=None, submitter=submitter)
+                await push_to_db(post, submitter, None)
 
                 await context.bot.send_photo(chat_id=DESTINATION_CHANNEL_ID, photo=photo_media, caption=f"{update.effective_user.name or 'Custom User'}'s Photo")
 
@@ -146,14 +162,26 @@ async def forward_message(update: Update, context: CallbackContext):
             traceback_details.append(f"Offending Line of Exception: {frame.line}")
             traceback_details.append(f"".ljust(50,'-') + '\n')
 
-        write_log(message=f"Error traceback\n\n{'\n'.join(traceback_details)}\n\n", level='debug')
+        write_log(message=f"Error traceback\n\n{chr(10).join(traceback_details)}\n\n", level='debug')
 
         await message.reply_text("Sorry, there was an error forwarding your submission.")
 
 
 
-
-
+async def push_to_db(post: Post, submitter: User, media_obj):
+    async with db_manager as session:
+        session.add(submitter)
+        session.add(post)
+        session.flush()
+        try:
+            # Upload the media_obj to s3
+            if media_obj:
+                s3.upload_fileobj(media_obj, "mindshare-posts-binaries", post.source+"/"+str(post.id)+"."+post.file_type)
+            session.commit()
+            write_log(message="Post successfully written to the database", level="debug")
+        except:
+            session.rollback()
+            write_log(message="Error writing post to the database", level="error")
 
 
 

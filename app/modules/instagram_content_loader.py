@@ -29,13 +29,14 @@ def get_instagram_post_media(shortcode: str) -> tuple[bytes, str, str, bool, int
         response.raise_for_status()
 
         media_content = response.content
+        file_type = response.headers["Content-Type"].split("/")[1]
 
-        return media_content, post_url, media_data['owner'], media_data['is_video'], media_data['likes'], media_data['views'], media_data['is_carousel']
+        return media_content, post_url, media_data['owner'], media_data['is_video'], media_data['likes'], media_data['views'], media_data['is_carousel'], file_type
 
     except Exception as e:
         write_log(message=f"An Exception occurred when calling 'get_instagram_post_media()'\n ---> ({type(e)}) {e}", level='error')
         write_log(message=f"An Exception occurred when calling 'get_instagram_post_media()'\n ---> Post URL: {post_url}", level='debug')
-        return None, None, None, None, None, None, None
+        return None, None, None, None, None, None, None, None
 
 
 def parse_instagram_data(post_url: str) -> dict:
