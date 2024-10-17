@@ -175,6 +175,10 @@ async def push_to_db(post: Post, submitter: User, media_obj: bytes):
         session.add(submitter)
         session.add(post)
         session.flush()
+        # refresh object after flush to get updated values/data generated
+        session.refresh(submitter)
+        session.refresh(post)
+        
         try:
             # Upload the media_obj to s3
             if media_obj:

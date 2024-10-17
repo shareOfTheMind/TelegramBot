@@ -15,7 +15,7 @@ class User(Base):
 
 
     def __repr__(self) -> str:
-        return f"<User(id={self.id}, name='{self.name}')>"
+        return f"<User(id={self.id}, name='{self.username}')>"
 
 class Post(Base):
     __tablename__ = "post"
@@ -33,4 +33,4 @@ class Post(Base):
 
 
     def __repr__(self) -> str:
-        return  f"<Post(id={self.id}, poster='{self.poster}', likes={self.likes}, views={self.views}, is_video={self.is_video})>"
+        return  f"<Post(id={self.id}, poster='{self.poster}', likes={self.likes}, views={self.views}, file_type={self.file_type})>"
