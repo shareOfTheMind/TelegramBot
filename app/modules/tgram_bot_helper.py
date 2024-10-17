@@ -75,7 +75,7 @@ def get_media_from_ig_post(short_code: str) -> (tuple[bytes, str, str, bool, int
 
 
 
-def get_media_from_tiktok_post(share_link: str) -> (tuple[bytes, str, str, bool, int, int | None] | tuple[None, None, None, None, None, None]):
+def get_media_from_tiktok_post(share_link: str) -> (tuple[bytes, str, str, bool, int, int, str| None] | tuple[None, None, None, None, None, None, None]):
     '''
         Calls `get_tiktok_post_media()` to extract specific metadata from an tiktok post
 
@@ -86,6 +86,7 @@ def get_media_from_tiktok_post(share_link: str) -> (tuple[bytes, str, str, bool,
         - A boolean indicating whether the post is a video. In this case it will always be true (bool)
         - The amount likes (int)
         - The amount of views (int)
+        - The file type extension (str)
     '''
     
     return get_tiktok_post_media(share_link)
