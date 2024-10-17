@@ -174,7 +174,7 @@ async def push_to_db(post: Post, submitter: User, media_obj: bytes):
     async with db_manager as session:
         session.add(submitter)
         session.add(post)
-        session.flush()
+        await session.flush()
 
         try:
             # Upload the media_obj to s3
