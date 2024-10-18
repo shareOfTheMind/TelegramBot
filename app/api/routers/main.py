@@ -5,10 +5,7 @@ import os
 base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../../'))
 sys.path.append(base_dir)
 
-from fastapi import FastAPI, Depends
-from sqlalchemy.ext.asyncio import AsyncSession
-from app.modules.database.manager import get_db
-# from app.modules.database.manager import get_db  # Reuse your async session from the backend
+from fastapi import FastAPI
 import users, posts
 
 app = FastAPI()

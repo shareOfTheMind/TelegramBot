@@ -14,7 +14,7 @@ class UserCreate(BaseModel):
     '''
     model_config = ConfigDict(from_attributes=True)
     
-    id: int
+    uid: int
     username: Annotated[str, StringConstraints(max_length=32)]
 
 
@@ -44,7 +44,8 @@ class PostCreate(BaseModel):
     source: str
     share_link: str
     file_type: str
-    submitter_id: int
+    link_code: str
+    submitter_uid: int
 
 
     @classmethod
@@ -67,6 +68,6 @@ class UserRead(BaseModel):
     '''
     model_config = ConfigDict(from_attributes=True)
 
-    id: int
+    uid: int
     username: str
     posts: Optional[List["PostCreate"]] = []

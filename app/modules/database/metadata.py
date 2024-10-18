@@ -8,7 +8,7 @@ class Base(DeclarativeBase):
 class User(Base):
     __tablename__ = "user"
 
-    uid: Mapped[int] = mapped_column(BigInteger, primary_key=True, autoincrement=True)
+    uid: Mapped[int] = mapped_column(BigInteger, primary_key=True)
     username: Mapped[str] = mapped_column(String(32))
     # uid: Mapped[int] = mapped_column(BigInteger)
 
@@ -21,7 +21,7 @@ class User(Base):
 class Post(Base):
     __tablename__ = "post"
 
-    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    id: Mapped[int] = mapped_column(primary_key=True)
     poster: Mapped[str] = mapped_column(String(32))
     likes: Mapped[int]
     views: Mapped[int]

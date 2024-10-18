@@ -22,7 +22,8 @@ async def create_post(post: PostCreate, db: AsyncSession = Depends(get_db)):
         source=post.source,
         share_link=post.share_link,
         file_type=post.file_type,
-        submitter_id=post.submitter_id
+        link_code=post.link_code,
+        submitter_uid=post.submitter_uid
     )
     db.add(new_post)
     await db.flush()
@@ -42,14 +43,14 @@ async def get_posts(db: AsyncSession = Depends(get_db)):
 
 
 # Route to get a user and all associated posts
-@router.get("/users/{user_id}/posts", response_model=List[PostCreate])
-async def get_user_posts(user_id: int, db: AsyncSession = Depends(get_db)):
+@router.get("/users/{uid}/posts", response_model=List[PostCreate])
+async def get_user_posts(uid: int, db: AsyncSession = Depends(get_db)):
     # Ensure user_id is a valid integer
-    if user_id is None:
+    if uid is None:
         raise HTTPException(status_code=400, detail="User ID cannot be None")
 
     # Query to fetch the user and eager-load the associated posts
-    result = await db.execute(select(User).where(User.id == user_id).options(selectinload(User.posts)))
+    result = await db.execute(select(User).where(User.uid == uid).options(selectinload(User.posts)))
     user = result.scalars().first()
 
     if not user:
