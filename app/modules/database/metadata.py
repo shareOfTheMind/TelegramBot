@@ -8,15 +8,15 @@ class Base(DeclarativeBase):
 class User(Base):
     __tablename__ = "user"
 
-    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    uid: Mapped[int] = mapped_column(BigInteger, primary_key=True, autoincrement=True)
     username: Mapped[str] = mapped_column(String(32))
-    uid: Mapped[int] = mapped_column(BigInteger)
+    # uid: Mapped[int] = mapped_column(BigInteger)
 
     posts: Mapped[List["Post"]] = relationship(back_populates="submitter")
 
 
     def __repr__(self) -> str:
-        return f"<User(id={self.id}, name='{self.username}')>"
+        return f"<User(id={self.uid}, name='{self.username}')>"
 
 class Post(Base):
     __tablename__ = "post"
@@ -30,7 +30,7 @@ class Post(Base):
     file_type: Mapped[str]
     link_code: Mapped[str] = mapped_column(Text)
 
-    submitter_id = mapped_column(ForeignKey("user.id"))
+    submitter_uid = mapped_column(ForeignKey("user.uid"))
     submitter: Mapped[User] = relationship(back_populates="posts")
 
 
