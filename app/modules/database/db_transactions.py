@@ -35,7 +35,7 @@ async def push_to_db(post: Post, submitter: User, media_obj: bytes):
 
 
 # async def get_or_create_user(username: str, **kwargs) -> User:
-async def get_or_create_user(username: str) -> User:
+async def get_or_create_user(username: str, uid: int) -> User:
     """
     Retrieve a user by username, or create a new user if not found.
 
@@ -46,11 +46,11 @@ async def get_or_create_user(username: str) -> User:
     Returns:
         User: The retrieved or newly created User object.
     """
-    write_log(message=f'Checking for user with username: {username}...', level='info')
+    write_log(message=f'Checking for user "{username}" with telegram user id: {uid}...', level='info')
     
     async with db_manager as session:
         # Attempt to retrieve the user
-        result: AsyncResult = await session.execute(select(User).filter(User.username == username))
+        result: AsyncResult = await session.execute(select(User).filter(User.uid == uid))
         user: Optional[User] = result.scalars().first()
         
         if user:
@@ -59,7 +59,7 @@ async def get_or_create_user(username: str) -> User:
         
         # If user doesn't exist, create a new one
         write_log(message="User not found, creating new user...", level='info')
-        user = User(username=username)
+        user = User(username=username, uid=uid)
         # user = User(username=username, **kwargs)  # Assuming kwargs are other User fields
         session.add(user)
         await session.flush()  # Flush to get the ID and other defaults
@@ -75,7 +75,7 @@ async def get_or_create_user(username: str) -> User:
 
 
 
-async def user_exists(username: str) -> bool:
+async def user_exists(uid: int) -> bool:
     """
         Check if a user with the specified name exists in the database.
 
@@ -86,16 +86,16 @@ async def user_exists(username: str) -> bool:
             bool: True if the user exists, False otherwise.
     """
     async with db_manager as session:
-        result: AsyncResult = await session.execute(select(User).filter(User.username == username))
+        result: AsyncResult = await session.execute(select(User).filter(User.uid == uid))
         user: Optional[User] = result.scalars().first()
 
         return user is not None  # Return True if user exists, False otherwise
     
 
 
-async def get_user_by_username(username: str) -> User:
+async def get_user_by_uid(uid: int) -> User:
     """
-    Retrieve a user from the database by username.
+    Retrieve a user from the database by unique id.
 
     Args:
         username (str): The username of the user to retrieve.
@@ -103,11 +103,11 @@ async def get_user_by_username(username: str) -> User:
     Returns:
         User: The User object if found, None otherwise.
     """
-    write_log(message=f'Retrieving user with username: {username}...', level='info')
+    write_log(message=f'Retrieving user with uid: {uid}...', level='info')
     
     # Use the global db_manager to manage the session
     async with db_manager as session:
-        result: AsyncResult = await session.execute(select(User).filter(User.username == username))
+        result: AsyncResult = await session.execute(select(User).filter(User.uid == uid))
         user: Optional[User] = result.scalars().first()
         
         if user:
