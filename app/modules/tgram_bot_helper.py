@@ -1,5 +1,6 @@
 import re
 
+from urllib.parse import urlparse
 from telegram import Message
 from .instagram_content_loader import get_instagram_post_media
 from .tiktok_content_loader import get_tiktok_post_media
@@ -121,3 +122,11 @@ def contains_tiktok_link(text: str) -> bool:
 
     match = re.search(pattern, text)
     return match is not None
+
+
+def get_tiktok_link_code(text: str) -> str:
+    '''
+        Extracts the TikTok link code from a given text
+    '''
+    # return the url path unique code for tiktok share links
+    return urlparse(text).path.split('/')[-1]

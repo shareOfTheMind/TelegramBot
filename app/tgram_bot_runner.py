@@ -22,7 +22,7 @@ async def start(update: Update, context: CallbackContext):
 async def forward_message(update: Update, context: CallbackContext):
     write_log(level='info', message=f"forward_message called with update: {update}")
 
-    submitter = await get_or_create_user(username=update.message.chat.username)
+    submitter = await get_or_create_user(username=update.message.chat.username, uid=update.message.from_user.id)
 
     submission_message = []
 
@@ -58,7 +58,7 @@ async def forward_message(update: Update, context: CallbackContext):
                     submission_message.append("Your media was parsed successfully and is processing!\n")
 
                     # Create post object to upload to the DB
-                    post = Post(poster=profile, likes=like_count, views=view_count, source="instagram", share_link=url, file_type=file_type, submitter=submitter)
+                    post = Post(poster=profile, likes=like_count, views=view_count, source="instagram", share_link=url, file_type=file_type, submitter=submitter, link_code=shortcode)
                     await push_to_db(post, submitter, media_obj) 
 
                     if is_video:
@@ -82,6 +82,8 @@ async def forward_message(update: Update, context: CallbackContext):
                 elif contains_tiktok_link(msg_text):
                     write_log(message=f"TikTok Link URL Found Within Message Text", level='info')
 
+                    tik_tok_link_code = get_tiktok_link_code(msg_text)
+
                     media_obj, url, profile, is_video, like_count, view_count, file_type = get_media_from_tiktok_post(msg_text)
                     if not media_obj:
                         write_log(message=f"Media Not Parsed Successfully", level='warning')
@@ -92,7 +94,7 @@ async def forward_message(update: Update, context: CallbackContext):
                     submission_message.append("Your media was parsed successfully and is processing!\n")
 
                     # Create post object to upload to the DB
-                    post = Post(poster=profile, likes=like_count, views=view_count, source="tiktok", share_link=url, file_type=file_type, submitter=submitter)
+                    post = Post(poster=profile, likes=like_count, views=view_count, source="tiktok", share_link=url, file_type=file_type, submitter=submitter, link_code=tik_tok_link_code)
                     await push_to_db(post, submitter, media_obj)                    
 
                     caption_data = f"{url}\n❤️ {like_count:,}\n👀 {view_count:,}"
@@ -114,7 +116,7 @@ async def forward_message(update: Update, context: CallbackContext):
                 video_media = message.video
 
                 # Create post object to upload to the DB
-                post = Post(poster=message.chat.username, likes=0, views=0, source="direct", share_link=video_media.file_id, file_type=video_media.mime_type, submitter=submitter)
+                post = Post(poster=message.chat.username, likes=0, views=0, source="direct", share_link=video_media.file_id, file_type=video_media.mime_type, submitter=submitter, link_code='-1')
                 await push_to_db(post, submitter, None)
 
                 await context.bot.send_video(chat_id=DESTINATION_CHANNEL_ID, video=video_media, caption=f"{update.effective_user.name or 'Custom User'}'s Video")
@@ -124,7 +126,7 @@ async def forward_message(update: Update, context: CallbackContext):
                 photo_media = message.photo[-1]
 
                 # Create post object to upload to the DB
-                post = Post(poster=message.chat.username, likes=0, views=0, source="direct", share_link=photo_media.file_id, file_type='jpeg', submitter=submitter)
+                post = Post(poster=message.chat.username, likes=0, views=0, source="direct", share_link=photo_media.file_id, file_type='jpeg', submitter=submitter, link_code='-1')
                 await push_to_db(post, submitter, None)
 
                 await context.bot.send_photo(chat_id=DESTINATION_CHANNEL_ID, photo=photo_media, caption=f"{update.effective_user.name or 'Custom User'}'s Photo")
