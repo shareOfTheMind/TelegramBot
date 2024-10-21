@@ -1,10 +1,4 @@
-import sys
-import os
-
-# Append the base directory of your project to sys.path
-base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../../'))
-sys.path.append(base_dir)
-
+import __init__ # all of the initialization that needs to be done, modification of sys path done there
 from fastapi import FastAPI
 import users, posts
 
@@ -17,7 +11,7 @@ app.include_router(posts.router)
 # Example root route
 @app.get("/")
 async def root():
-    return {"message": "Welcome to the API"}
+    return {"message": "Welcome to the API route for MindVirus"}
 
 
 

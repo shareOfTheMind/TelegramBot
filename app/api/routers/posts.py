@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy.orm import selectinload
@@ -25,20 +26,36 @@ async def create_post(post: PostCreate, db: AsyncSession = Depends(get_db)):
         link_code=post.link_code,
         submitter_uid=post.submitter_uid
     )
-    db.add(new_post)
-    await db.flush()
-    await db.commit()
-    await db.refresh(new_post)
 
-    return new_post
+    try:
+        db.add(new_post)
+        await db.flush()
+        await db.commit()
+        await db.refresh(new_post)
+
+        return new_post
+    except IntegrityError as ie:
+        await db.rollback()  # Roll back the session in case of an error
+        if "unique constraint" in str(ie.orig):  # Adjust this condition as necessary for your DB
+            raise HTTPException(status_code=400, detail="Post with this ID already exists.")
+        else:
+            raise HTTPException(status_code=500, detail="An error occurred while creating the post.")
+
+
+    
 
 
 
 @router.get("/posts/", response_model=List[PostCreate])
 async def get_posts(db: AsyncSession = Depends(get_db)):
-    result = await db.execute(select(Post))
-    posts = result.scalars().all()
-    return posts
+    PAGE_SIZE = 50
+
+    try:
+        result = await db.execute(select(Post))
+        posts = result.scalars().all()
+        return posts
+    except Exception as ex:
+        raise HTTPException(status_code=500, detail=f"An error occurred while fetching ALL posts: {str(ex)}")
 
 
 
