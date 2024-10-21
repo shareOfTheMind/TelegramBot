@@ -1,4 +1,5 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query, Response
+from sqlalchemy import func
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
@@ -7,7 +8,7 @@ from app.modules.database.manager import get_db  # Use your backend's DB session
 from app.modules.database.metadata import Post, User  # Your backend's models
 from typing import List
 
-from app.api.models.api_models import PostCreate
+from app.api.models.api_models import PostCreate, PostsPaginationResponse
 
 router = APIRouter()
 
@@ -46,14 +47,50 @@ async def create_post(post: PostCreate, db: AsyncSession = Depends(get_db)):
 
 
 
-@router.get("/posts/", response_model=List[PostCreate])
-async def get_posts(db: AsyncSession = Depends(get_db)):
+@router.get("/posts/", response_model=PostsPaginationResponse)
+async def get_posts(page: int = Query(1, ge=1), db: AsyncSession = Depends(get_db)):
+    # http://localhost:8000/posts/?page=1
     PAGE_SIZE = 50
 
+    # Calculate offset based on the page and fixed page size
+    offset = (page - 1) * PAGE_SIZE
+
     try:
-        result = await db.execute(select(Post))
+        # Query the total number of posts to calculate total pages
+        total_posts_query = select(func.count(Post.id))  # Modify to match your ORM query
+        total_posts_result = await db.execute(total_posts_query)
+        total_posts = total_posts_result.scalar_one()  # Get the scalar value (total count)
+
+        # Query the posts for the current page with LIMIT and OFFSET
+        posts_query = select(Post).limit(PAGE_SIZE).offset(offset)
+        result = await db.execute(posts_query)
         posts = result.scalars().all()
-        return posts
+
+        # Convert SQLAlchemy Post objects to Pydantic models
+        pydantic_posts = [PostCreate.model_validate(post) for post in posts]
+
+        # Calculate total pages
+        total_pages = (total_posts + PAGE_SIZE - 1) // PAGE_SIZE  # Round up division
+
+        # Generate next page URL if there are more pages
+        next_page_url = None
+        if page < total_pages:
+            next_page_url = f"/posts/?page={page + 1}"
+
+        response_data = {
+            "data": pydantic_posts,
+            "pagination" : {
+                "current_page": page,
+                "total_pages": total_pages,
+                "next_page": next_page_url
+            }
+        }
+
+        return response_data
+
+        # result = await db.execute(select(Post))
+        # posts = result.scalars().all()
+        # return posts
     except Exception as ex:
         raise HTTPException(status_code=500, detail=f"An error occurred while fetching ALL posts: {str(ex)}")
 

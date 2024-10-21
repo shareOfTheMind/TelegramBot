@@ -71,3 +71,16 @@ class UserRead(BaseModel):
     uid: int
     username: str
     posts: Optional[List["PostCreate"]] = []
+
+
+
+class PaginationMeta(BaseModel):
+    current_page: int
+    total_pages: int
+    next_page: Optional[str]  # URL for the next page, can be None
+
+
+
+class PostsPaginationResponse(BaseModel):
+    data: List[PostCreate]  # List of posts
+    pagination: PaginationMeta  # Pagination metadata
