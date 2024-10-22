@@ -63,5 +63,9 @@ VOLUME ["$LOG_DIR", "$CONFIG_DIR/.env"]
 # Log running the application
 RUN echo "[INFO] $(date '+%Y-%m-%d %H:%M:%S') - Starting the Application..." >> "$LOG_FILE"
 
+# EXPOSE api port
+EXPOSE 5952
+
 # Command to start the application
-CMD ["python", "/srv/telegram_service/app/tgram_bot_runner.py"]
+CMD [ "sh", "-c", "python /srv/telegram_service/app/tgram_bot_runner.py & python /srv/telegram_service/app/api/routers/main.py" ]
+# CMD ["python", "/srv/telegram_service/app/tgram_bot_runner.py"]
