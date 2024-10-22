@@ -58,7 +58,7 @@ async def forward_message(update: Update, context: CallbackContext):
                         is_carousel = False
                         file_type = existing_post.file_type
 
-                        media_obj = get_user_media(media_id=existing_post.id, media_type=existing_post.file_type, media_source=existing_post.source)
+                        media_obj = await get_user_media(media_id=existing_post.id, media_type=existing_post.file_type, media_source=existing_post.source)
                     else:
                         # next, grab the media, url, profile, and video (bool) from post obj
                         media_obj, url, profile, is_video, like_count, view_count, is_carousel, file_type = get_media_from_ig_post(short_code=shortcode)
@@ -108,7 +108,7 @@ async def forward_message(update: Update, context: CallbackContext):
                         view_count = existing_post.views
                         file_type = existing_post.file_type
                         
-                        media_obj = get_user_media(media_id=existing_post.id, media_type=existing_post.file_type, media_source=existing_post.source)
+                        media_obj = await get_user_media(media_id=existing_post.id, media_type=existing_post.file_type, media_source=existing_post.source)
                     else:
                         media_obj, url, profile, is_video, like_count, view_count, file_type = get_media_from_tiktok_post(msg_text)
                     if not media_obj:
