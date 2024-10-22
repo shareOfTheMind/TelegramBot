@@ -10,7 +10,7 @@ from typing import Optional
 from config.tgram_bot_logger import write_log
 from modules.database.metadata import Post, User
 from modules.database.manager import db_manager
-from . import s3
+from . import s3, BUCKET_NAME
 
 
 
@@ -118,3 +118,35 @@ async def get_user_by_uid(uid: int) -> User:
         return user  # Return the User object (or None if not found)
 
         
+
+async def get_user_media(media_id: int, media_type: str, media_source: str) -> Optional[bytes]:
+    write_log(message=f"Retrieving user media from bucket", level='info')
+
+    media_filepath_query = f"{media_source}/{str(media_id)}.{media_type}"
+
+    # Use the global s3 client to retrieve the media from s3
+    response = s3.get_object(Bucket=BUCKET_NAME, Key=media_filepath_query)
+
+    if media_content:=response['Body']:
+        media_content = media_content.read()
+        write_log(message=f"Media successfully retrieved from bucket", level="info")
+        return media_content
+    
+    write_log(message=f"Media not found for id: {media_id}", level="warning")
+    return None
+
+
+async def get_user_media_metadata(link_code: str):
+    write_log(message=f'Retrieving post metadata {link_code}...', level='info')
+    
+    # Use the global db_manager to manage the session
+    async with db_manager as session:
+        result: AsyncResult = await session.execute(select(Post).filter(Post.link_code == link_code))
+        post: Optional[Post] = result.scalars().first()
+        
+        if post:
+            write_log(message="Post successfully retrieved from the database", level="info")
+        else:
+            write_log(message="Post object does not exist.. Request will be made to given url", level="warning")
+        
+        return post  # Return the User object (or None if not found)
