@@ -55,7 +55,7 @@ jobs:
               -v /var/log/tgram_bot_logging:/var/log/tgram_bot_logging \
               -v /home/ubuntu/config/.env:/srv/telegram_service/app/config/.env \
               -v /home/ubuntu/config/.aws:/root/.aws \
-              -p 5952:5952
+              -p 5952:5952 \
               --restart unless-stopped \
               "${{ secrets.DOCKER_USERNAME }}"/telegram_bot_app:latest
           EOF
