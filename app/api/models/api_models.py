@@ -1,7 +1,6 @@
 from typing import Optional, List
 from typing_extensions import Annotated
-from pydantic import BaseModel, ConfigDict, StringConstraints
-
+from pydantic import BaseModel, ConfigDict, StringConstraints, computed_field, Field
 
 
 
@@ -57,8 +56,30 @@ class PostCreate(BaseModel):
         if len(v.get('poster', '')) > 32:
             v['poster'] = v['poster'][:32]
         return v
+    
 
+class PostRead(BaseModel):
+    '''
+        Data model for post data READ structure validation
+    '''
+    model_config = ConfigDict(from_attributes=True)
 
+    id: int
+    poster: Annotated[str, StringConstraints(max_length=32)]
+    likes: int
+    views: int
+    source: str
+    share_link: str
+    file_type: str
+    link_code: str
+    submitter_uid: int
+
+    # media_endpoint: str = Field(default="/posts/media/?media_id={}")
+    @computed_field
+    def media_endpoint(self) -> str:
+        return f"/posts/media/?media_id={self.id}"
+
+    
 '''
     GET (Read) Request Models
 '''
@@ -84,3 +105,11 @@ class PaginationMeta(BaseModel):
 class PostsPaginationResponse(BaseModel):
     data: List[PostCreate]  # List of posts
     pagination: PaginationMeta  # Pagination metadata
+
+
+
+class PostMedia(BaseModel):
+    media_id: int
+    file_type: str
+    link_code: str
+    media_content: bytes

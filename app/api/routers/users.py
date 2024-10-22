@@ -2,11 +2,12 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
+from sqlalchemy.orm import selectinload
 from app.modules.database.manager import get_db  # Use your backend's DB session
 from app.modules.database.metadata import User  # Your backend's models
 from typing import List
 
-from app.api.models.api_models import UserCreate, UserRead
+from app.api.models.api_models import UserCreate, PostCreate
 
 router = APIRouter()
 
@@ -58,3 +59,21 @@ async def get_user_by_id(uid: int, db: AsyncSession = Depends(get_db)):
         raise HTTPException(status_code=404, detail="User not found")
 
     return user
+
+
+
+# Route to get a user and all associated posts
+@router.get("/users/{uid}/posts", response_model=List[PostCreate])
+async def get_user_posts(uid: int, db: AsyncSession = Depends(get_db)):
+    # Ensure user_id is a valid integer
+    if uid is None:
+        raise HTTPException(status_code=400, detail="User ID cannot be None")
+
+    # Query to fetch the user and eager-load the associated posts
+    result = await db.execute(select(User).where(User.uid == uid).options(selectinload(User.posts)))
+    user = result.scalars().first()
+
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    return user.posts

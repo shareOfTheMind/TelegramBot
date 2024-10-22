@@ -1,20 +1,22 @@
-from fastapi import APIRouter, Depends, HTTPException, Query, Response
+from botocore.exceptions import NoCredentialsError, PartialCredentialsError
+from app.modules.database.__init__ import s3, BUCKET_NAME
+from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
+from fastapi.responses import JSONResponse, StreamingResponse
 from sqlalchemy import func
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy.orm import selectinload
 from app.modules.database.manager import get_db  # Use your backend's DB session
-from app.modules.database.metadata import Post, User  # Your backend's models
-from typing import List
-
-from app.api.models.api_models import PostCreate, PostsPaginationResponse
+from app.modules.database.metadata import Post  # Your backend's models
+from app.api.models.api_models import PostCreate, PostsPaginationResponse, PostRead, PostMedia
+from typing import Dict, Union
 
 router = APIRouter()
 
 
 
-@router.post("/posts/", response_model=PostCreate)
+@router.post("/posts/", response_model=PostCreate, status_code=status.HTTP_201_CREATED)
 async def create_post(post: PostCreate, db: AsyncSession = Depends(get_db)):
     new_post = Post(
         id=post.id,
@@ -87,27 +89,67 @@ async def get_posts(page: int = Query(1, ge=1), db: AsyncSession = Depends(get_d
         }
 
         return response_data
-
-        # result = await db.execute(select(Post))
-        # posts = result.scalars().all()
-        # return posts
     except Exception as ex:
-        raise HTTPException(status_code=500, detail=f"An error occurred while fetching ALL posts: {str(ex)}")
+        raise HTTPException(status_code=500, detail=f"An error occurred while fetching posts: {str(ex)}")
 
 
 
-# Route to get a user and all associated posts
-@router.get("/users/{uid}/posts", response_model=List[PostCreate])
-async def get_user_posts(uid: int, db: AsyncSession = Depends(get_db)):
-    # Ensure user_id is a valid integer
-    if uid is None:
-        raise HTTPException(status_code=400, detail="User ID cannot be None")
+'''
+    S3 Route
+'''
+
+@router.get("/posts/media/")
+async def get_media(media_data: PostRead):
+    try:
+        if not media_data.id:
+            raise HTTPException(status_code=400, detail="No media ID provided")
+        media_id = media_data.id
+
+        media_file_name = '.'.join([str(media_id), media_data.file_type])
+        media_object_query_path = '/'.join([media_data.source, media_file_name])
+        # Try to get the object from S3
+        response = s3.get_object(Bucket=BUCKET_NAME, Key=media_object_query_path)
+        
+        # Read the object's content
+        media_content = response['Body'].read()
+
+        return Response(content=media_content, media_type=f"application/{media_data.file_type}")
+        # stream_response = StreamingResponse(media_content, media_type=f"application/{media_data.file_type}")
+
+        # stream_response.headers['X-Media-ID'] = str(media_id)
+        # stream_response.headers['X-Media-Type'] = media_data.file_type
+        # stream_response.headers['X-Link-Code'] = media_data.link_code or ''
+
+        # return stream_response
+    
+    except s3.exceptions.NoSuchKey:
+        raise HTTPException(status_code=404, detail=f"Object [{media_file_name}] not found in the S3 bucket")
+    except (NoCredentialsError, PartialCredentialsError):
+        raise HTTPException(status_code=500, detail="AWS credentials not found or incomplete")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+
+@router.get("/posts/{ucode}", response_model=PostRead)
+async def get_user_posts(ucode: str, db: AsyncSession = Depends(get_db), get_media: bool = Query(default=False)):
+# async def get_user_posts(ucode: str, db: AsyncSession = Depends(get_db)):
+    # Ensure ucode was provided
+    if not ucode:
+        raise HTTPException(status_code=400, detail="No link code provided")
 
     # Query to fetch the user and eager-load the associated posts
-    result = await db.execute(select(User).where(User.uid == uid).options(selectinload(User.posts)))
-    user = result.scalars().first()
+    result = await db.execute(select(Post).where(Post.link_code == ucode))
+    post   = result.scalars().first()
 
-    if not user:
-        raise HTTPException(status_code=404, detail="User not found")
-    
-    return user.posts
+    if not post:
+        raise HTTPException(status_code=404, detail=f"Post with link code [{ucode}] not found")
+
+    if get_media:
+        post = PostRead.model_validate(post, from_attributes=True)
+
+    return post
+
+
+
+
