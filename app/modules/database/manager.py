@@ -5,7 +5,7 @@ from contextlib import asynccontextmanager
 from dataclasses import dataclass
 from typing import  AsyncGenerator
 
-from modules.database import DATABASE_NAME, DATABASE_PASSWORD, DATABASE_PORT, DATABASE_URI, DATABASE_USERNAME
+from . import DATABASE_NAME, DATABASE_PASSWORD, DATABASE_PORT, DATABASE_URI, DATABASE_USERNAME
 from sqlalchemy import create_engine
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker, scoped_session

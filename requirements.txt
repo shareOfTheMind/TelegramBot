@@ -4,7 +4,9 @@ asyncpg==0.29.0
 attrs==24.2.0
 beautifulsoup4==4.12.3
 boto3==1.35.42
+boto3-stubs==1.35.45
 botocore==1.35.42
+botocore-stubs==1.35.45
 certifi==2024.7.4
 cffi==1.17.0
 cfgv==3.4.0
@@ -23,6 +25,7 @@ identify==2.6.0
 idna==3.7
 instaloader==4.13.1
 jmespath==1.0.1
+mypy-boto3-s3==1.35.45
 nodeenv==1.9.1
 outcome==1.3.0.post0
 platformdirs==4.2.2
@@ -47,6 +50,8 @@ SQLAlchemy==2.0.35
 starlette==0.40.0
 trio==0.26.2
 trio-websocket==0.11.1
+types-awscrt==0.22.4
+types-s3transfer==0.10.3
 typing_extensions==4.12.2
 urllib3==2.2.2
 uvicorn==0.32.0

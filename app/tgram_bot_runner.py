@@ -10,7 +10,7 @@ from modules.tgram_bot_helper import *
 from config.tgram_bot_logger import setup_logger, write_log, remove_old_logs
 from modules import DESTINATION_CHANNEL_ID, TOKEN
 from modules.database.metadata import Post
-from modules.database.db_transactions import push_to_db, get_or_create_user
+from modules.database.db_transactions import push_to_db, get_or_create_user, get_user_media_metadata, get_user_media
 
 # setup logging
 bot_logger = setup_logger(level=10) # debug level logging
@@ -46,9 +46,23 @@ async def forward_message(update: Update, context: CallbackContext):
                         write_log(message=f"No valid Instagram post URL found within message, unsuccessful in parsing shortcode", level='warning')
                         await message.reply_text("No valid Instagram post URL found in the message.")
                         return
-                
-                    # next, grab the media, url, profile, and video (bool) from post obj
-                    media_obj, url, profile, is_video, like_count, view_count, is_carousel, file_type = get_media_from_ig_post(short_code=shortcode)
+                    
+                    # Now check if this piece of media exists within our databases before attempting to make a request for it
+                    write_log(message='Looking for post object within our databases', level='info')
+                    if existing_post:=await get_user_media_metadata(link_code=shortcode):
+                        url = existing_post.share_link
+                        profile = existing_post.poster
+                        is_video = True if existing_post.file_type == 'mp4' else False # NOTE: this will need to change, probably needs to be in the ORM--need a simple bool to tell us video or not
+                        like_count = existing_post.likes
+                        view_count = existing_post.views
+                        is_carousel = False
+                        file_type = existing_post.file_type
+
+                        media_obj = get_user_media(media_id=existing_post.id, media_type=existing_post.file_type, media_source=existing_post.source)
+                    else:
+                        # next, grab the media, url, profile, and video (bool) from post obj
+                        media_obj, url, profile, is_video, like_count, view_count, is_carousel, file_type = get_media_from_ig_post(short_code=shortcode)
+
                     if not media_obj:
                         write_log(message=f"Media Not Parsed Successfully", level='warning')
                         await message.reply_text("Failed to download media from Instagram post.")
@@ -57,9 +71,10 @@ async def forward_message(update: Update, context: CallbackContext):
                     write_log(message=f"Media Was Parsed Successfully From Instagram URL", level='info')
                     submission_message.append("Your media was parsed successfully and is processing!\n")
 
-                    # Create post object to upload to the DB
-                    post = Post(poster=profile, likes=like_count, views=view_count, source="instagram", share_link=url, file_type=file_type, submitter=submitter, link_code=shortcode)
-                    await push_to_db(post, submitter, media_obj) 
+                    if not existing_post:
+                        # Create post object to upload to the DB
+                        post = Post(poster=profile, likes=like_count, views=view_count, source="instagram", share_link=url, file_type=file_type, submitter=submitter, link_code=shortcode)
+                        await push_to_db(post, submitter, media_obj) 
 
                     if is_video:
                         if not is_carousel:
@@ -83,8 +98,19 @@ async def forward_message(update: Update, context: CallbackContext):
                     write_log(message=f"TikTok Link URL Found Within Message Text", level='info')
 
                     tik_tok_link_code = get_tiktok_link_code(msg_text)
-
-                    media_obj, url, profile, is_video, like_count, view_count, file_type = get_media_from_tiktok_post(msg_text)
+                    # Now check if this piece of media exists within our databases before attempting to make a request for it
+                    write_log(message='Looking for post object within our databases', level='info')
+                    if existing_post:=await get_user_media_metadata(link_code=shortcode):
+                        url = existing_post.share_link
+                        profile = existing_post.poster
+                        is_video = True # NOTE: this will need to change, probably needs to be in the ORM--need a simple bool to tell us video or not
+                        like_count = existing_post.likes
+                        view_count = existing_post.views
+                        file_type = existing_post.file_type
+                        
+                        media_obj = get_user_media(media_id=existing_post.id, media_type=existing_post.file_type, media_source=existing_post.source)
+                    else:
+                        media_obj, url, profile, is_video, like_count, view_count, file_type = get_media_from_tiktok_post(msg_text)
                     if not media_obj:
                         write_log(message=f"Media Not Parsed Successfully", level='warning')
                         await message.reply_text("Failed to download media from TikTok post.")
@@ -93,9 +119,10 @@ async def forward_message(update: Update, context: CallbackContext):
                     write_log(message=f"Media Was Parsed Successfully From TikTok URL", level='info')
                     submission_message.append("Your media was parsed successfully and is processing!\n")
 
-                    # Create post object to upload to the DB
-                    post = Post(poster=profile, likes=like_count, views=view_count, source="tiktok", share_link=url, file_type=file_type, submitter=submitter, link_code=tik_tok_link_code)
-                    await push_to_db(post, submitter, media_obj)                    
+                    if not existing_post:
+                        # Create post object to upload to the DB
+                        post = Post(poster=profile, likes=like_count, views=view_count, source="tiktok", share_link=url, file_type=file_type, submitter=submitter, link_code=tik_tok_link_code)
+                        await push_to_db(post, submitter, media_obj)                    
 
                     caption_data = f"{url}\n❤️ {like_count:,}\n👀 {view_count:,}"
                     video_input = InputFile(obj=media_obj, filename=f"{profile}_{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}.mp4")
