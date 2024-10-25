@@ -77,7 +77,7 @@ class PostRead(BaseModel):
     # media_endpoint: str = Field(default="/posts/media/?media_id={}")
     @computed_field
     def media_endpoint(self) -> str:
-        return f"/posts/media/?media_id={self.id}"
+        return f"/posts/media/{self.id}/?source={self.source}&type={self.file_type}"
 
     
 '''
