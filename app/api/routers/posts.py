@@ -98,22 +98,25 @@ async def get_posts(page: int = Query(1, ge=1), db: AsyncSession = Depends(get_d
     S3 Route
 '''
 
-@router.get("/posts/media/")
-async def get_media(media_data: PostRead):
+@router.get("/posts/media/{media_id}")
+async def get_media(media_id: str, source: str = Query(default=None), type: str = Query(default=None)):
     try:
-        if not media_data.id:
+        if not media_id:
             raise HTTPException(status_code=400, detail="No media ID provided")
-        media_id = media_data.id
+        if not type:
+            raise HTTPException(status_code=400, detail="No media type provided")
+        if not source or source not in ('instagram','tiktok','direct'):
+            raise HTTPException(status_code=400, detail="No valid media source provided")
 
-        media_file_name = '.'.join([str(media_id), media_data.file_type])
-        media_object_query_path = '/'.join([media_data.source, media_file_name])
+        media_file_name = '.'.join([str(media_id), type])
+        media_object_query_path = '/'.join([source, media_file_name])
         # Try to get the object from S3
         response = s3.get_object(Bucket=BUCKET_NAME, Key=media_object_query_path)
         
         # Read the object's content
         media_content = response['Body'].read()
 
-        return Response(content=media_content, media_type=f"application/{media_data.file_type}")
+        return Response(content=media_content, media_type=f"application/{type}")
         # stream_response = StreamingResponse(media_content, media_type=f"application/{media_data.file_type}")
 
         # stream_response.headers['X-Media-ID'] = str(media_id)
@@ -132,7 +135,7 @@ async def get_media(media_data: PostRead):
 
 
 @router.get("/posts/{ucode}", response_model=PostRead)
-async def get_user_posts(ucode: str, db: AsyncSession = Depends(get_db), get_media: bool = Query(default=False)):
+async def get_user_posts(ucode: str, db: AsyncSession = Depends(get_db)):
 # async def get_user_posts(ucode: str, db: AsyncSession = Depends(get_db)):
     # Ensure ucode was provided
     if not ucode:
@@ -145,9 +148,7 @@ async def get_user_posts(ucode: str, db: AsyncSession = Depends(get_db), get_med
     if not post:
         raise HTTPException(status_code=404, detail=f"Post with link code [{ucode}] not found")
 
-    if get_media:
-        post = PostRead.model_validate(post, from_attributes=True)
-
+    post = PostRead.model_validate(post, from_attributes=True)
     return post
 
 
