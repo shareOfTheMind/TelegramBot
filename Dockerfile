@@ -68,4 +68,4 @@ RUN echo "[INFO] $(date '+%Y-%m-%d %H:%M:%S') - Starting the Application..." >> 
 
 # Command to start the application
 # CMD [ "sh", "-c", "python /srv/telegram_service/app/tgram_bot_runner.py && python /srv/telegram_service/app/api/routers/main.py" ]
-# CMD ["python", "/srv/telegram_service/app/tgram_bot_runner.py"]
+CMD ["python", "/srv/telegram_service/app/tgram_bot_runner.py"]
