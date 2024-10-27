@@ -38,18 +38,25 @@ jobs:
       - name: Push Docker image
         run: docker push "${{ secrets.DOCKER_USERNAME }}"/telegram_bot_app:latest
 
+      # SSH into VPS and copy the docker-compose.yml
+      - name: Copy docker-compose file to server
+        run: |
+          scp -i ${{ secrets.TG_DEPLOY_SSH_KEY }} docker-compose.yml ubuntu@${{ secrets.AWS_TG_SERVER }}:/home/ubuntu/config/
 
-      # SSH into VPS to deploy using Docker Compose
-      - name: Deploy with Docker Compose on AWS
+
+      # SSH into VPS and deploy with Docker Compose
+      - name: Deploy with Docker Compose
         run: |
           ssh ubuntu@${{ secrets.AWS_TG_SERVER }} << 'EOF'
-            cd /srv/telegram_service/
-            
-            # Pull the latest image and clean up unused resources
-            docker-compose pull telegram_bot_app
-            docker-compose down
-            docker-compose up -d --remove-orphans
+            docker-compose -f /home/ubuntu/config/docker-compose.yml
+            docker container prune -f
+            docker image prune -af
+            docker volume prune -f
+
+            docker-compose -f /srv/telegram_service/docker-compose.yml pull 
+            docker-compose -f /path/to/docker-compose.yml up -d
           EOF
+
       # SSH into VPS and pull the latest Docker image, stop old container, and start the new one
       # - name: Deploy container to AWS
       #   run: |
