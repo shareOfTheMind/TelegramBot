@@ -34,20 +34,20 @@ jobs:
       # Build the Docker images using Docker Compose
       - name: Build Docker images
         run: |
-          cd /home/ubuntu/config/
+          cd /home/ubuntu/config
           docker-compose build
 
       # Push Docker images to Docker Hub
       - name: Push Docker images
         run: |
-          cd /home/ubuntu/config/
+          cd /home/ubuntu/config
           docker-compose push  
 
       # SSH into VPS and deploy using Docker Compose
       - name: Deploy containers to AWS
         run: |
           ssh ubuntu@${{ secrets.AWS_TG_SERVER }} << 'EOF'
-            cd /home/ubuntu/config/
+            cd /home/ubuntu/config
             docker-compose down
             docker-compose up -d
             docker system prune -f
