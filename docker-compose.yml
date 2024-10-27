@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  bot:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: python /srv/telegram_service/app/tgram_bot_runner.py
+    restart: unless-stopped
+    depends_on:
+      - api
+    volumes:
+      - /var/log/tgram_bot_logging:/var/log/tgram_bot_logging
+      - /home/ubuntu/config/.env:/srv/telegram_service/app/config/.env
+      - /home/ubuntu/config/.aws:/root/.aws
+    networks:
+      - app-network
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: python /srv/telegram_service/app/api/routers/main.py
+    ports:
+      - "5952:5952"
+    restart: unless-stopped
+    volumes:
+      - /var/log/tgram_bot_logging:/var/log/tgram_bot_logging
+      - /home/ubuntu/config/.env:/srv/telegram_service/app/config/.env
+      - /home/ubuntu/config/.aws:/root/.aws
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
