@@ -4,7 +4,6 @@ FROM python:3.12.3-slim
 # Set environment variables
 ENV PYTHONUNBUFFERED 1
 ENV APP_DIR=/srv/telegram_service
-ENV VENV_DIR=$APP_DIR/api_service_venv
 ENV LOG_DIR=$APP_DIR/logs
 ENV CONFIG_DIR=/home/config
 ENV LOG_FILE=$LOG_DIR/docker_build_deploy.log
@@ -46,7 +45,8 @@ RUN echo "[INFO] $(date '+%Y-%m-%d %H:%M:%S') - Installing Edge WebDriver" >> "$
 RUN echo "[INFO] $(date '+%Y-%m-%d %H:%M:%S') - Generating Application Files" >> "$LOG_FILE"
 
 # Copy application files
-COPY . $APP_DIR/
+COPY ./app/ $APP_DIR/
+# COPY . $APP_DIR/
 
 # Log before installing Python packages
 RUN echo "[INFO] $(date '+%Y-%m-%d %H:%M:%S') - Installing Python Packages" >> "$LOG_FILE" && \
@@ -67,5 +67,4 @@ RUN echo "[INFO] $(date '+%Y-%m-%d %H:%M:%S') - Starting the Application..." >> 
 # EXPOSE 5952
 
 # Command to start the application
-# CMD [ "sh", "-c", "python /srv/telegram_service/app/tgram_bot_runner.py && python /srv/telegram_service/app/api/routers/main.py" ]
-CMD ["python", "/srv/telegram_service/app/tgram_bot_runner.py"]
+CMD ["python", "/srv/telegram_service/tgram_bot_runner.py"]

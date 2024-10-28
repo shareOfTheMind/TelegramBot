@@ -61,7 +61,7 @@ def get_shortcode_from_message(message: Message) -> str | None:
 
 
 
-def get_media_from_ig_post(short_code: str) -> (tuple[bytes, str, str, bool, int, int, bool, str | None, list[str]] | tuple[None, None, None, None, None, None, None, None, None]):
+def get_media_from_ig_post(short_code: str) -> (tuple[bytes, str, str, bool, int, int, bool, str | None] | tuple[None, None, None, None, None, None, None, None]):
     '''
         Calls `get_instagram_post_media()` to extract specific metadata from an instagram post
 
@@ -70,11 +70,6 @@ def get_media_from_ig_post(short_code: str) -> (tuple[bytes, str, str, bool, int
         - The post URL (str)
         - The profile URL (str)
         - A boolean indicating whether the post is a video (bool)
-        - likes
-        - views
-        - A boolean indicating whether the post is a carousel (bool)
-        - The file type extension (str)
-        - A list of top 5 comments (list[str])
     '''
     
     return get_instagram_post_media(shortcode=short_code)

@@ -19,7 +19,7 @@ session.headers.update({
 })
 
 
-def get_instagram_post_media(shortcode: str) -> tuple[bytes, str, str, bool, int, int, list[str]]:
+def get_instagram_post_media(shortcode: str) -> tuple[bytes, str, str, bool, int, int]:
     try:
         post_url = f"https://www.instagram.com/p/{shortcode}/"
         session.headers.update({'Referer': f'https://www.instagram.com/p/{shortcode}/'})
@@ -36,7 +36,7 @@ def get_instagram_post_media(shortcode: str) -> tuple[bytes, str, str, bool, int
     except Exception as e:
         write_log(message=f"An Exception occurred when calling 'get_instagram_post_media()'\n ---> ({type(e)}) {e}", level='error')
         write_log(message=f"An Exception occurred when calling 'get_instagram_post_media()'\n ---> Post URL: {post_url}", level='debug')
-        return None, None, None, None, None, None, None, None, None
+        return None, None, None, None, None, None, None, None
 
 
 def parse_instagram_data(post_url: str) -> dict:
@@ -85,7 +85,6 @@ def parse_instagram_data(post_url: str) -> dict:
             is_video = post_data['is_video']
             likes    = post_data['edge_media_preview_like']['count']
             views    = post_data.get('video_view_count', None)
-            top5_comments = []
         else:
             post_data = data['items'][0]
             post_owner = post_data['owner']['username']
@@ -125,8 +124,7 @@ def parse_instagram_data(post_url: str) -> dict:
             'likes': likes,
             'views': views,
             'owner': post_owner,
-            'is_carousel': is_carousel_item,
-            'comments': top5_comments
+            'is_carousel': is_carousel_item
         }
 
     except KeyError as e:
