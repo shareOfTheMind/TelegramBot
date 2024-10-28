@@ -61,7 +61,7 @@ async def forward_message(update: Update, context: CallbackContext):
                         media_obj = await get_user_media(media_id=existing_post.id, media_type=existing_post.file_type, media_source=existing_post.source)
                     else:
                         # next, grab the media, url, profile, and video (bool) from post obj
-                        media_obj, url, profile, is_video, like_count, view_count, is_carousel, file_type = get_media_from_ig_post(short_code=shortcode)
+                        media_obj, url, profile, is_video, like_count, view_count, is_carousel, file_type, comments = get_media_from_ig_post(short_code=shortcode)
 
                     if not media_obj:
                         write_log(message=f"Media Not Parsed Successfully", level='warning')
