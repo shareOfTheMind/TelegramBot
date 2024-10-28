@@ -5,6 +5,7 @@ from __init__ import LOGGING_CONFIG
 
 app = FastAPI()
 
+
 # Include routers for different endpoints
 app.include_router(users.router)
 app.include_router(posts.router)
