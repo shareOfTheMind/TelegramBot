@@ -3,7 +3,7 @@ FROM python:3.12.3-slim
 
 # Set environment variables
 ENV PYTHONUNBUFFERED 1
-ENV APP_DIR=/srv/telegram_service_api
+ENV APP_DIR=/srv/telegram_service_api/api
 ENV LOG_DIR=$APP_DIR/logs
 ENV CONFIG_DIR=/home/config
 ENV LOG_FILE=$LOG_DIR/docker_build_deploy.log
@@ -47,4 +47,4 @@ RUN echo "[INFO] $(date '+%Y-%m-%d %H:%M:%S') - Starting the API Server..." >> "
 EXPOSE 5952
 
 # Command to start the application
-CMD ["python", "/srv/telegram_service_api/routers/main.py"]
+CMD ["python", "/srv/telegram_service_api/api/routers/main.py"]
