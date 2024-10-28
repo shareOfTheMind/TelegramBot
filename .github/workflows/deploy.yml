@@ -33,7 +33,7 @@ jobs:
 
       - name: Build application image
         run: |
-          docker build -t "${{ secrets.DOCKER_USERNAME }}"/telegram_bot_app:latest -f ./app/Dockerfile ./app
+          docker build -t "${{ secrets.DOCKER_USERNAME }}"/telegram_bot_app:latest . ./app
 
 
       - name: Build API image
