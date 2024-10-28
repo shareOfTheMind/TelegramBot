@@ -1,0 +1,11 @@
+tgram_venv
+api_venv
+__pycache__
+*.pyc
+insta.*
+runescape_fren*
+iasumico*
+.env
+.vscode
+tgram_bot.py
+deploy.sh

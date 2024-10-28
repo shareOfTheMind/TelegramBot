@@ -4,7 +4,6 @@ FROM python:3.12.3-slim
 # Set environment variables
 ENV PYTHONUNBUFFERED 1
 ENV APP_DIR=/srv/telegram_service_api
-ENV VENV_DIR=$APP_DIR/api_service_venv
 ENV LOG_DIR=$APP_DIR/logs
 ENV CONFIG_DIR=/home/config
 ENV LOG_FILE=$LOG_DIR/docker_build_deploy.log
@@ -17,20 +16,23 @@ RUN mkdir -p $LOG_DIR
 
 # Create deploy log file and initialize log
 RUN touch "$LOG_FILE" && \
-    echo "[INFO] $(date '+%Y-%m-%d %H:%M:%S') - Starting the build process" >> "$LOG_FILE"
+echo "[INFO] $(date '+%Y-%m-%d %H:%M:%S') - Starting the build process" >> "$LOG_FILE"
 
-
-# Log before copying application files
-RUN echo "[INFO] $(date '+%Y-%m-%d %H:%M:%S') - Generating API Files" >> "$LOG_FILE"
-
-# Copy application files
-COPY . $APP_DIR/
+# Copy the requirements file into the image
+COPY ./api/requirements.txt ./
 
 # Log before installing Python packages
 RUN echo "[INFO] $(date '+%Y-%m-%d %H:%M:%S') - Installing Python Packages" >> "$LOG_FILE" && \
     pip install -r requirements.txt && \
     pip install debugpy && \
     echo "[INFO] $(date '+%Y-%m-%d %H:%M:%S') - Python packages installed successfully" >> "$LOG_FILE" || echo "[ERROR] $(date '+%Y-%m-%d %H:%M:%S') - Failed to install Python packages" >> "$LOG_FILE"
+    
+
+# Log before copying application files
+RUN echo "[INFO] $(date '+%Y-%m-%d %H:%M:%S') - Generating API Files" >> "$LOG_FILE"
+
+# Copy application files
+COPY ./api/ $APP_DIR/
 
 # Log mapping volumes
 RUN echo "[INFO] $(date '+%Y-%m-%d %H:%M:%S') - Mapping Volumes" >> "$LOG_FILE"
@@ -45,4 +47,4 @@ RUN echo "[INFO] $(date '+%Y-%m-%d %H:%M:%S') - Starting the API Server..." >> "
 EXPOSE 5952
 
 # Command to start the application
-CMD ["python", "/srv/telegram_service_api/api/routers/main.py"]
+CMD ["python", "/srv/telegram_service_api/routers/main.py"]
