@@ -3,7 +3,7 @@ FROM python:3.12.3-slim
 
 # Set environment variables
 ENV PYTHONUNBUFFERED 1
-ENV APP_DIR=/srv/telegram_service
+ENV APP_DIR=/srv/telegram_service/app
 ENV LOG_DIR=$APP_DIR/logs
 ENV CONFIG_DIR=/home/config
 ENV LOG_FILE=$LOG_DIR/docker_build_deploy.log
@@ -67,4 +67,4 @@ RUN echo "[INFO] $(date '+%Y-%m-%d %H:%M:%S') - Starting the Application..." >> 
 # EXPOSE 5952
 
 # Command to start the application
-CMD ["python", "/srv/telegram_service/tgram_bot_runner.py"]
+CMD ["python", "/srv/telegram_service/app/tgram_bot_runner.py"]
