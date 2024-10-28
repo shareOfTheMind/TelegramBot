@@ -3,11 +3,11 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy.orm import selectinload
-from app.modules.database.manager import get_db  # Use your backend's DB session
-from app.modules.database.metadata import User  # Your backend's models
+from api.database.manager import get_db  # Use your backend's DB session
+from api.database.metadata import User  # Your backend's models
 from typing import List
 
-from app.api.models.api_models import UserCreate, PostCreate
+from api.models.api_models import UserCreate, PostCreate
 
 router = APIRouter()
 
