@@ -1,16 +1,13 @@
 from botocore.exceptions import NoCredentialsError, PartialCredentialsError
-from app.modules.database.__init__ import s3, BUCKET_NAME
+from api.database.__init__ import s3, BUCKET_NAME
 from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
-from fastapi.responses import JSONResponse, StreamingResponse
 from sqlalchemy import func
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
-from sqlalchemy.orm import selectinload
-from app.modules.database.manager import get_db  # Use your backend's DB session
-from app.modules.database.metadata import Post  # Your backend's models
-from app.api.models.api_models import PostCreate, PostsPaginationResponse, PostRead, PostMedia
-from typing import Dict, Union
+from api.database.manager import get_db  # Use your backend's DB session
+from api.database.metadata import Post  # Your backend's models
+from api.models.api_models import PostCreate, PostsPaginationResponse, PostRead, PostMedia
 
 router = APIRouter()
 
