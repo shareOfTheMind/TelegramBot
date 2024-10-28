@@ -26,6 +26,4 @@ if __name__ == "__main__":
             uvicorn.run(app, host="0.0.0.0", port=5952)
         else:
             print(f"AN ERROR OCCURRED WHILE STARTING THE API\n{str(ex)}")
-    # uvicorn.run(app, host="0.0.0.0", port=5952)
-
-    # write_log(message=f"MindVirus API Started Successfully on Port {5952}", level='info')
+    # uvicorn.run(app, host="0.0.0.0", port=5952) 
